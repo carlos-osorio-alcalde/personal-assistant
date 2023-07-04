@@ -1,0 +1,17 @@
+# Ignore the Assistant environment folder
+assistant/
+
+# Ignore the temp files for test the sdk
+#test_sdk.py
+
+# Ignore all the pycache folders in the project
+**/__pycache__/
+
+# Ignore the .vscode folder
+.vscode/
+
+# Ignore .pem files
+**/*.pem
+
+# Ignore the .sh script to connect the virtual machine
+connect.sh
