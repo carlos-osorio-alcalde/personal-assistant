@@ -15,3 +15,6 @@ assistant/
 
 # Ignore the .sh script to connect the virtual machine
 connect.sh
+
+# Ignore the .log files
+**/*.log
