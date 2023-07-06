@@ -1,5 +1,3 @@
-from typing import Dict
-
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -10,19 +8,16 @@ from assistantbot.ai.text.prompts.words import (
     USER_PROMPT_TEMPLATE,
 )
 
+from .utils import get_random_word
+
 
 class CallbackRandomWord:
-    def __init__(self, word_data: Dict) -> None:
+    def __init__(self) -> None:
         """
         This class is used to get the response of the llm based on the random
         word of the day.
-
-        Parameters
-        ----------
-        word_data : Dict
-            The data from the random word of the day.
         """
-        self.word_data = word_data
+        self.word_data = get_random_word()
         if self.word_data["definition"] == "":
             self.prompt_word_template = (
                 RANDOM_WORD_PROMPT_TEMPLATE_WITHOUT_DEFINITION
