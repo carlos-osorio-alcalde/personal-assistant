@@ -4,8 +4,7 @@ from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder
 
 from assistantbot.configuration_logs import logger
-from assistantbot.commands.start.handlers import start_handler
-from assistantbot.commands.temperature.handlers import temperature_handlers
+from assistantbot.commands_handlers import get_implemented_command_handlers
 from assistantbot.conversation.text.handlers import message_handler
 
 # Load environment variables
@@ -17,16 +16,19 @@ def main_bot() -> None:
     This function starts the bot.
     """
     # Get the bot token from the environment variables
-    token = os.getenv("BOT_TOKEN")
+    token = os.getenv("BOT_TOKEN_KEY")
     app = ApplicationBuilder().token(token).build()
     logger.info("Bot started")
 
-    # Add the start handler
-    app.add_handler(start_handler())
-
-    # Add the temperature handlers
-    for handler in temperature_handlers():
-        app.add_handler(handler)
+    # Get the command handlers and add them to the bot
+    command_handlers = get_implemented_command_handlers()
+    for handler in command_handlers:
+        # If the handler returns a list of handlers, add them all
+        if isinstance(handler(), list):
+            for h in handler():
+                app.add_handler(h)
+        else:
+            app.add_handler(handler())
 
     # Add the message handler
     app.add_handler(message_handler())

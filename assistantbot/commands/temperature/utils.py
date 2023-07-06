@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Dict
 
 import requests
 from dotenv import load_dotenv
@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_weather_conditions(city: Literal["med", "bog", "tul"]):
+def get_weather_conditions(city: Literal["med", "bog", "tul"]) -> Dict:
     """
     This function gets the current temperature in a city.
 
@@ -37,7 +37,7 @@ def get_weather_conditions(city: Literal["med", "bog", "tul"]):
         url.format(
             lat=locations[city]["lat"],
             lon=locations[city]["lon"],
-            api_key=os.getenv("OPEN_WEATHER_API"),
+            api_key=os.getenv("OPEN_WEATHER_API_KEY"),
         )
     )
 
@@ -53,7 +53,3 @@ def get_weather_conditions(city: Literal["med", "bog", "tul"]):
         "temperature": response.json()["main"]["temp"],
         "weather_status": response.json()["weather"][0]["description"],
     }
-
-
-if __name__ == "__main__":
-    print(get_weather_conditions("med"))

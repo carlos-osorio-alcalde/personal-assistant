@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler
 from assistantbot.commands.temperature.callback import CallbackTemperature
 
 
-def temperature_handlers() -> List[CommandHandler]:
+def temperature_handler() -> List[CommandHandler]:
     """
     This function returns the temperature handlers for each configured
     location.
