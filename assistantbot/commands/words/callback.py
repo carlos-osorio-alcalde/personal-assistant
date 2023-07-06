@@ -17,14 +17,25 @@ class CallbackRandomWord:
         This class is used to get the response of the llm based on the random
         word of the day.
         """
+        self.word_data = None
+        self.prompt_word_template = None
+
+    def _set_random_word(self) -> None:
+        """
+        This function is used to set the random word of the day and
+        the prompt
+        """
+        # Get the random word of the day
         self.word_data = get_random_word()
-        if self.word_data["definition"] == "":
+
+        # Get the prompt template
+        if self.word_data["definition"]:
             self.prompt_word_template = (
-                RANDOM_WORD_PROMPT_TEMPLATE_WITHOUT_DEFINITION
+                RANDOM_WORD_PROMPT_TEMPLATE_DEFINITION
             )
         else:
             self.prompt_word_template = (
-                RANDOM_WORD_PROMPT_TEMPLATE_DEFINITION
+                RANDOM_WORD_PROMPT_TEMPLATE_WITHOUT_DEFINITION
             )
 
     async def get_random_word_response(
@@ -40,6 +51,9 @@ class CallbackRandomWord:
         context : ContextTypes.DEFAULT_TYPE
             The context object from Telegram.
         """
+        # Change the word in every response
+        self._set_random_word()
+
         # Send the typing action to the user
         await context.bot.send_chat_action(
             chat_id=update.effective_chat.id, action="typing"
