@@ -1,7 +1,10 @@
-import requests
 import os
-from dotenv import load_dotenv
 from typing import Dict
+
+import requests
+from dotenv import load_dotenv
+
+from assistantbot.configuration import config
 
 # Load environment variables
 load_dotenv()
@@ -25,7 +28,9 @@ def get_random_word() -> Dict:
         "X-RapidAPI-Host": "wordsapiv1.p.rapidapi.com",
     }
 
-    response = requests.get(url, headers=headers, params=querystring).json()
+    response = requests.get(
+        url, headers=headers, params=querystring, timeout=config["TIMEOUT"]
+    ).json()
 
     return {
         "word": response["word"],

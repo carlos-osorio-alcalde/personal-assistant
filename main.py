@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder
 
+from assistantbot.configuration import config
 from assistantbot.configuration_logs import logger
 from assistantbot.commands_handlers import get_implemented_command_handlers
 from assistantbot.conversation.text.handlers import message_handler
@@ -17,7 +18,13 @@ def main_bot() -> None:
     """
     # Get the bot token from the environment variables
     token = os.getenv("BOT_TOKEN_KEY")
-    app = ApplicationBuilder().token(token).build()
+    app = (
+        ApplicationBuilder()
+        .token(token)
+        .connect_timeout(config['TIMEOUT'])
+        .get_updates_connect_timeout(config['TIMEOUT'])
+        .build()
+    )
     logger.info("Bot started")
 
     # Get the command handlers and add them to the bot

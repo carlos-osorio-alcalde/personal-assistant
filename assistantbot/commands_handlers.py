@@ -1,8 +1,8 @@
-from telegram.ext import CommandHandler
-
-from typing import List, Callable, Union
-from pathlib import Path
 import importlib
+from pathlib import Path
+from typing import Callable, List, Union
+
+from telegram.ext import CommandHandler
 
 
 def get_implemented_command_handlers() -> List[

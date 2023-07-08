@@ -4,6 +4,8 @@ RANDOM_WORD_PROMPT_TEMPLATE_DEFINITION = """
 
     Create a sentence with the word {word} in a funny way.
     Make sure that the meaning of the word is well used.
+    Aditionally to the sentence you created, return a translation to spanish.
+    Use as much emojis as you can!
     Follow the following template:
 
     --------------------------
@@ -14,11 +16,12 @@ RANDOM_WORD_PROMPT_TEMPLATE_DEFINITION = """
 """
 
 RANDOM_WORD_PROMPT_TEMPLATE_WITHOUT_DEFINITION = """
-    The random word of the day is {word}.
-    The definition of {word} is not available, unfortunately. {definition}
+    The random word of the day is {word}. {definition}
 
-    Create a sentence with the word {word} in a funny way. 
-    Make sure that the meaning of the word is well used. 
+    Create a sentence with the word {word} in a funny way.
+    Adtionally to the sentence you created, return a translation to spanish.
+    Use as much emojis as you can!
+
     Follow the following template:
 
     --------------------------

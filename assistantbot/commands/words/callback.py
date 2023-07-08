@@ -7,6 +7,7 @@ from assistantbot.ai.text.prompts.words import (
     RANDOM_WORD_PROMPT_TEMPLATE_WITHOUT_DEFINITION,
     USER_PROMPT_TEMPLATE,
 )
+from assistantbot.configuration_logs import logger
 
 from .utils import get_random_word
 
@@ -51,12 +52,15 @@ class CallbackRandomWord:
         context : ContextTypes.DEFAULT_TYPE
             The context object from Telegram.
         """
-        # Change the word in every response
-        self._set_random_word()
-
         # Send the typing action to the user
         await context.bot.send_chat_action(
             chat_id=update.effective_chat.id, action="typing"
+        )
+
+        # Change the word in every response
+        self._set_random_word()
+        logger.info(
+            f"Random word of the day obtained: {self.word_data['word']}"
         )
 
         # Instantiate the AI response

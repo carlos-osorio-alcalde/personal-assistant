@@ -1,10 +1,12 @@
 import json
 import os
 from pathlib import Path
-from typing import Literal, Dict
+from typing import Dict, Literal
 
 import requests
 from dotenv import load_dotenv
+
+from assistantbot.configuration import config
 
 # Load environment variables
 load_dotenv()
@@ -38,7 +40,8 @@ def get_weather_conditions(city: Literal["med", "bog", "tul"]) -> Dict:
             lat=locations[city]["lat"],
             lon=locations[city]["lon"],
             api_key=os.getenv("OPEN_WEATHER_API_KEY"),
-        )
+        ),
+        timeout=config["TIMEOUT"],
     )
 
     if response.status_code != 200:
