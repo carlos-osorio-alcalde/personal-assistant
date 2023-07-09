@@ -1,12 +1,11 @@
 import logging
+from assistantbot.configuration import config
 
-# Set up logging
+# Set up the paths
 logging.basicConfig(
+    filename=config["ERROR_LOG_FILE"],
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    filemode="a",
-    datefmt="%H:%M:%S",
-    filename="assistantbot/logs/assistantbot.log",
+    level=logging.ERROR,
 )
 
 # Set up the logger

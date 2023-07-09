@@ -7,7 +7,7 @@ from assistantbot.ai.text.prompts.words import (
     RANDOM_WORD_PROMPT_TEMPLATE_WITHOUT_DEFINITION,
     USER_PROMPT_TEMPLATE,
 )
-from assistantbot.configuration_logs import logger
+from assistantbot.logs.configuration import logger
 
 from .utils import get_random_word
 
