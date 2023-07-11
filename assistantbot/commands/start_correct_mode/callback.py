@@ -6,7 +6,9 @@ from telegram.ext import ContextTypes
 state_message = ""
 
 
-async def entry_correct_grammar(update: Update) -> None:
+async def entry_correct_grammar(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> str:
     """
     This function corrects the grammar of the message sent by the user.
 
