@@ -42,7 +42,7 @@ def main() -> None:
     app.add_handler(message_handler())
 
     # Add the error handler
-    # app.add_error_handler(error_handler)
+    app.add_error_handler(error_handler)
 
     # Run the bot
     app.run_polling(
