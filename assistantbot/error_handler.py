@@ -28,9 +28,11 @@ async def error_handler(
 
     # Get the message from the error
     message = f"""
-    Something went wrong. This is the last line from the error log:
+        Something went wrong. This is the last line from the error log.
+        Please, Carlos, check the error log file and fix the error.
+        The last line from the error log is:
 
-    ``` {last_line_error} ```
+        {last_line_error}
     """
 
     # Send the error message to the user

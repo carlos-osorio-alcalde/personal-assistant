@@ -1,4 +1,4 @@
-from telegram.ext import MessageHandler
+from telegram.ext import MessageHandler, filters
 
 from assistantbot.ai.text.prompts.conversation import (
     CONVERSATION_BASE_TEMPLATE,
@@ -16,7 +16,7 @@ def message_handler() -> MessageHandler:
         The message handler.
     """
     return MessageHandler(
-        None,
+        filters.TEXT,
         ConversationCallback(
             base_system_prompt=CONVERSATION_BASE_TEMPLATE
         ).create_response,

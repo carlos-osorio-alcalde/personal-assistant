@@ -6,14 +6,14 @@ from telegram.ext import ApplicationBuilder
 from assistantbot.configuration import config
 from assistantbot.logs.configuration import logger
 from assistantbot.commands_handlers import get_implemented_command_handlers
-from assistantbot.conversation.text.handlers import message_handler
 from assistantbot.error_handler import error_handler
+from assistantbot.conversation.text.handlers import message_handler
 
 # Load environment variables
 load_dotenv()
 
 
-def main_bot() -> None:
+def main() -> None:
     """
     This function starts the bot.
     """
@@ -31,7 +31,7 @@ def main_bot() -> None:
     # Get the command handlers and add them to the bot
     command_handlers = get_implemented_command_handlers()
     for handler in command_handlers:
-        # If the handler returns a list of handlers, add them all
+        # If the object returns a list of handlers, add them all
         if isinstance(handler(), list):
             for h in handler():
                 app.add_handler(h)
@@ -42,11 +42,15 @@ def main_bot() -> None:
     app.add_handler(message_handler())
 
     # Add the error handler
-    app.add_error_handler(error_handler)
+    # app.add_error_handler(error_handler)
 
     # Run the bot
-    app.run_polling()
+    app.run_polling(
+        timeout=config["TIMEOUT"],
+        allowed_updates=config["ALLOWED_UPDATES"],
+        connect_timeout=config["TIMEOUT"],
+    )
 
 
 if __name__ == "__main__":
-    main_bot()
+    main()

@@ -5,7 +5,7 @@ from assistantbot.configuration import config
 logging.basicConfig(
     filename=config["ERROR_LOG_FILE"],
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.ERROR,
+    level=logging.INFO,
 )
 
 # Set up the logger

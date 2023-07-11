@@ -2,7 +2,14 @@
 START_MESSAGE: "Hey Carlos, I'm your assistant bot. I can help you with your daily tasks."
 
 # Timeouts times in seconds
-TIMEOUT: 30
+TIMEOUT: 85
 
 # Path for the error log file
 ERROR_LOG_FILE: "assistantbot/logs/assistantbot_error.log"
+
+# Allowed updates to be processed
+ALLOWED_UPDATES:
+  - message
+  - edited_message
+  - channel_post
+  - edited_channel_post

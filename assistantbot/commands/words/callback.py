@@ -9,7 +9,7 @@ from assistantbot.ai.text.prompts.words import (
 )
 from assistantbot.logs.configuration import logger
 
-from .utils import get_random_word
+from .utils import RandomWord
 
 
 class CallbackRandomWord:
@@ -27,10 +27,10 @@ class CallbackRandomWord:
         the prompt
         """
         # Get the random word of the day
-        self.word_data = get_random_word()
+        self.word_data = RandomWord().get_random_word()
 
         # Get the prompt template
-        if self.word_data["definition"]:
+        if self.word_data["definition"] != "":
             self.prompt_word_template = (
                 RANDOM_WORD_PROMPT_TEMPLATE_DEFINITION
             )
