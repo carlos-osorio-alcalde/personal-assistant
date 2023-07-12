@@ -1,6 +1,7 @@
 import datetime
-import pytz
 from typing import Dict
+
+import pytz
 
 
 def get_weekday_moment() -> Dict:

@@ -13,3 +13,6 @@ ALLOWED_UPDATES:
   - edited_message
   - channel_post
   - edited_channel_post
+
+# Locations for the weather command
+WEATHER_LOCATIONS: "assistantbot/locations.json"

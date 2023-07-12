@@ -1,4 +1,5 @@
 import logging
+
 from assistantbot.configuration import config
 
 # Set up the paths

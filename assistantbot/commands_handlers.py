@@ -1,13 +1,8 @@
-import importlib
 from pathlib import Path
-from typing import Callable, List, Union
-
-from telegram.ext import CommandHandler
+from typing import List
 
 
-def get_implemented_command_handlers() -> List[
-    Callable[[None], Union[CommandHandler, List[CommandHandler]]]
-]:
+def get_implemented_command_handlers() -> List[str]:
     """
     This function gets all the implemented handlers.
 
@@ -17,19 +12,16 @@ def get_implemented_command_handlers() -> List[
         The list of implemented handlers.
     """
     path_commands = Path("assistantbot/commands")
-    implemented_handlers = []
+    exclude_files = ["__pycache__", "base.py", "__init__.py"]
 
-    for path in path_commands.iterdir():
-        if path.is_dir():
-            for file in path.iterdir():
-                if file.is_file():
-                    if file.name == "handlers.py":
-                        module = importlib.import_module(
-                            f"assistantbot.commands.{path.name}.handlers"
-                        )
-                        # Load the function {path.name} from the module
-                        implemented_handlers.append(
-                            getattr(module, f"{path.name}_handler")
-                        )
+    implemented_handlers = [
+        command.name
+        for command in path_commands.iterdir()
+        if command.name not in exclude_files
+    ]
 
     return implemented_handlers
+
+
+if __name__ == "__main__":
+    print(get_implemented_command_handlers())

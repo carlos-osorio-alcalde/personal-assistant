@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from assistantbot.configuration import config
 
 
@@ -16,11 +17,6 @@ async def error_handler(
     context : ContextTypes.DEFAULT_TYPE
         The context object from Telegram.
     """
-    # Send the typing action to the user
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action="typing"
-    )
-
     # Get the last error from logs/assistantbot.log
     with open(config["ERROR_LOG_FILE"], "r") as f:
         lines = f.readlines()
