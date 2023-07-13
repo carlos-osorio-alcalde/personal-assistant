@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes
 
-from assistantbot.ai.text.commands.base_response import BaseResponse
+from assistantbot.ai.text.base_response import BaseResponse
 from assistantbot.ai.text.prompts.words import (
     RANDOM_WORD_PROMPT_TEMPLATE_DEFINITION,
     RANDOM_WORD_PROMPT_TEMPLATE_WITHOUT_DEFINITION,

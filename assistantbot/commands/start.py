@@ -3,7 +3,7 @@ import os
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes
 
-from assistantbot.ai.text.commands.base_response import BaseResponse
+from assistantbot.ai.text.base_response import BaseResponse
 from assistantbot.ai.text.prompts.start import (
     START_PROMPT_TEMPLATE,
     START_USER_TEMPLATE,

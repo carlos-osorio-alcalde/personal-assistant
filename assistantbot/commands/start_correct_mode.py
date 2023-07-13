@@ -6,7 +6,11 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-
+from assistantbot.ai.text.base_response import BaseResponse
+from assistantbot.ai.text.prompts.correct_mode import (
+    CORRECT_MODE_PROMPT_TEMPLATE,
+    USER_PROMPT_TEMPLATE,
+)
 from assistantbot.commands.base import BaseCommand
 from assistantbot.commands.end_correct_mode import EndCorrectModeCommand
 
@@ -60,11 +64,19 @@ class StartCorrectModeCommand(BaseCommand):
         context : telegram.ext.CallbackContext
             The callback context.
         """
+        # Send the typing action to the user
+        await context.bot.send_chat_action(
+            chat_id=update.effective_chat.id, action="typing"
+        )
+
         # Get the message to correct
         message = update.effective_message.text
 
-        # TODO: Implement the AI corrector.
-        corrected_message = message
+        # Instantiate the AI response
+        get_corrected_message = BaseResponse(
+            CORRECT_MODE_PROMPT_TEMPLATE, USER_PROMPT_TEMPLATE
+        ).create_response
+        corrected_message = get_corrected_message(message=message)
 
         # The bot sends the message to correct
         await context.bot.send_message(

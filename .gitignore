@@ -21,3 +21,6 @@ connect.sh
 
 # Ignore the refactoring folder
 refactoring/
+
+# Ignore the test_voice.py
+test_voice.py
