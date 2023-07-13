@@ -1,8 +1,8 @@
 # Create the variable
 export CONTAINER_REGISTRY=assistantbotcontainer
-export IMAGE_NAME=assistantbot
+export IMAGE_NAME=assitantbot
 
-azr login
+az login
 az acr login --name $CONTAINER_REGISTRY
-docker tag $IMAGE_NAME:latest $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest
+docker tag $IMAGE_NAME $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest
 docker push $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest
