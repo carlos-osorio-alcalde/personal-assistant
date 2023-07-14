@@ -14,7 +14,7 @@ assistant/
 **/*.pem
 
 # Ignore the .sh script to connect the virtual machine
-connect.sh
+scripts/connect_vm.sh
 
 # Ignore the .log files
 **/*.log
