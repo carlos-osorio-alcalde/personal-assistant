@@ -138,14 +138,10 @@ class PronunciationAssessment:
         List[WordAssesmentResult]
             The list of word assessment results.
         """
-        words_results = []
-        for word in pronunciation_result.words:
-            if word.accuracy_score < 0.8:
-                words_results.append(
-                    WordAssesmentResult(
-                        word=word.word,
-                        accuracy_score=word.accuracy_score,
-                    )
-                )
-
+        words_results = [
+            WordAssesmentResult(
+                word=word.word, accuracy_score=word.accuracy_score
+            )
+            for word in pronunciation_result.words
+        ]
         return words_results

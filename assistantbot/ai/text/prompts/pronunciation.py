@@ -2,7 +2,7 @@ GLOBAL_PRONUNCIATION_ASSESSMENT = """
 -------------------------------------------------------------
 The phrase I heard was:
 
-<i> {phrase} </i>
+{phrase}
 
 And here's the result of your pronunciation assessment:
 * <b> Pronunciation score: </b> {pronunciation_score}

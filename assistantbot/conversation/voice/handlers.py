@@ -202,28 +202,42 @@ class VoiceHandler(ConversationHandler):
             assessment_result
         )
 
-        # Create the assessment string for global assessment
-        assessment_global_string = GLOBAL_PRONUNCIATION_ASSESSMENT.format(
-            phrase=reference_text,
-            pronunciation_score=global_assessment.pronunciation_score,
-            accuracy_score=global_assessment.accuracy_score,
-            fluency_score=global_assessment.fluency_score,
-        )
-
         # Create the assessment string for word assessment
         assessment_words_string = WORDS_PRONUNCIATION_ASSESSMENT_BASE
+        tagged_text = ""
 
         for word in word_assessment:
-            if word.accuracy_score < 0.9:
+            if word.accuracy_score <= 90:
+                # If there is a word with a bad pronunciation, add it to the
+                # assessment string
                 assessment_words_string += (
                     WORD_PRONUNCIATION_ASSESSMENT_PARTICULAR.format(
                         word=word.word,
                         accuracy_score=word.accuracy_score,
                     )
                 )
-        # If the pronunciation of all the words was ok, don't send that part
-        # of the assessment.
+
+            # Add the word to the colored text
+            if word.accuracy_score >= 95:
+                tag = "i"
+            elif word.accuracy_score >= 90:
+                tag = "u"
+            else:
+                tag = "s"
+            tagged_text += f"<{tag}>{word.word}</{tag}> "
+
+        # Create the assessment string for global assessment
+        assessment_global_string = GLOBAL_PRONUNCIATION_ASSESSMENT.format(
+            phrase=tagged_text,
+            pronunciation_score=global_assessment.pronunciation_score,
+            accuracy_score=global_assessment.accuracy_score,
+            fluency_score=global_assessment.fluency_score,
+        )
+
         if assessment_words_string == WORDS_PRONUNCIATION_ASSESSMENT_BASE:
-            assessment_words_string = ""
+            # If there are no words with a bad pronunciation, return only the
+            # global assessment
+            assessment_words_string = "\n Nice! You pronounced all" \
+                                       " the words correctly!"
 
         return assessment_global_string + assessment_words_string
