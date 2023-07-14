@@ -6,6 +6,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+
 from assistantbot.ai.text.base_response import BaseResponse
 from assistantbot.ai.text.prompts.correct_mode import (
     CORRECT_MODE_PROMPT_TEMPLATE,
@@ -39,8 +40,8 @@ class StartCorrectModeCommand(BaseCommand):
             The callback context.
         """
         entry_message = """
-        Hey Carlos! Send me a message to correct your grammar.
-        I pledge to not make a lot of changes.
+        Hey Carlos! Send me a message to correct your grammar. I pledge to 
+        not make a lot of changes.
         """
 
         # First, the bot sends the option to write the message to correct

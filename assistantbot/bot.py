@@ -3,17 +3,10 @@ import os
 from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder
 
-from assistantbot.commands import (
-    end_correct_mode,
-    start,
-    start_correct_mode,
-    temperature,
-    words,
-)
-
-# from assistantbot.commands_handlers import get_implemented_command_handlers
+from assistantbot.commands import temperature
+from assistantbot.commands_handlers import get_implemented_command_handlers
 from assistantbot.configuration import config
-from assistantbot.conversation.text.handlers import message_handler
+from assistantbot.conversation.text.handlers import TextHandler
 from assistantbot.error_handler import error_handler
 from assistantbot.logs.configuration import logger
 
@@ -34,18 +27,14 @@ def main() -> None:
         .pool_timeout(config["TIMEOUT"])
         .build()
     )
+
     logger.info("Bot started")
 
-    # Add the handlers
-    app.add_handler(start.StartCommand().command_handler())
-    app.add_handler(words.WordsCommand().command_handler())
-    app.add_handler(
-        start_correct_mode.StartCorrectModeCommand().command_handler()
-    )
-    app.add_handler(
-        end_correct_mode.EndCorrectModeCommand().command_handler()
-    )
-    # For temperature, create the handlers
+    # Add the implemented command handlers
+    for handler in get_implemented_command_handlers():
+        app.add_handler(handler().command_handler())
+
+    # For temperature, create the handlers using the factory
     temperature_handlers = (
         temperature.TemperatureCommandFactory().create_handlers()
     )
@@ -53,7 +42,7 @@ def main() -> None:
         app.add_handler(handler.command_handler())
 
     # Add the message handler
-    app.add_handler(message_handler())
+    app.add_handler(TextHandler().handler())
 
     # Add the error handler
     app.add_error_handler(error_handler)

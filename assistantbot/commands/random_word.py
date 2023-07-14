@@ -12,7 +12,7 @@ from assistantbot.logs.configuration import logger
 from assistantbot.utils.words import RandomWord
 
 
-class WordsCommand(BaseCommand):
+class RandomWordCommand(BaseCommand):
     """
     This class implements the /words command.
     """

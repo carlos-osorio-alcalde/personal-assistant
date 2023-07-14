@@ -1,5 +1,6 @@
-from telegram.ext import MessageHandler, filters, CallbackContext
 from telegram import Update
+from telegram.ext import CallbackContext, MessageHandler, filters
+
 from assistantbot.conversation.base import ConversationHandler
 
 

@@ -1,27 +1,49 @@
+import importlib
 from pathlib import Path
 from typing import List
 
+from dotenv import load_dotenv
+from assistantbot.commands.base import BaseCommand
 
-def get_implemented_command_handlers() -> List[str]:
+# Load environment variables
+load_dotenv()
+
+
+def get_implemented_command_handlers() -> List[BaseCommand]:
     """
     This function gets all the implemented handlers.
 
     Returns
     -------
-    List[Callable[[None], Union[CommandHandler, List[CommandHandler]]]
+    List[BaseCommand]
         The list of implemented handlers.
     """
-    path_commands = Path("assistantbot/commands")
-    exclude_files = ["__pycache__", "base.py", "__init__.py"]
+    # Excluded commands. The temperature command is excluded because it is
+    # implemented in a different way using the command factory pattern.
+    excluded_commands = ["__init__", "base", "temperature"]
 
-    implemented_handlers = [
-        command.name
-        for command in path_commands.iterdir()
-        if command.name not in exclude_files
+    # The implemented command is the intersection of the commands in the
+    # commands directory and the commands configured in the bot
+    implemented_commands = [
+        command_file.stem
+        for command_file in Path("assistantbot/commands").glob("*.py")
+        if command_file.stem not in excluded_commands
     ]
 
-    return implemented_handlers
+    # Add the and start commands
+    implemented_commands.append("start")
 
-
-if __name__ == "__main__":
-    print(get_implemented_command_handlers())
+    # Import all the implemented commands. This is done to avoid circular
+    # imports.
+    final_implemented_classes = []
+    for command in implemented_commands:
+        class_name_handler = (
+            f"{command.replace('_', ' ').title().replace(' ', '')}Command"
+        )
+        final_implemented_classes.append(
+            getattr(
+                importlib.import_module(f"assistantbot.commands.{command}"),
+                class_name_handler,
+            )
+        )
+    return final_implemented_classes
