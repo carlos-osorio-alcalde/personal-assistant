@@ -40,7 +40,7 @@ class StartCorrectModeCommand(BaseCommand):
             The callback context.
         """
         entry_message = """
-        Hey Carlos! Send me a message to correct your grammar. I pledge to 
+        Hey Carlos! Send me a message to correct your grammar. I pledge to
         not make a lot of changes.
         """
 

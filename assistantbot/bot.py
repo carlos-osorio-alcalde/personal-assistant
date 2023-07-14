@@ -7,6 +7,7 @@ from assistantbot.commands import temperature
 from assistantbot.commands_handlers import get_implemented_command_handlers
 from assistantbot.configuration import config
 from assistantbot.conversation.text.handlers import TextHandler
+from assistantbot.conversation.voice.handlers import VoiceHandler
 from assistantbot.error_handler import error_handler
 from assistantbot.logs.configuration import logger
 
@@ -42,7 +43,15 @@ def main() -> None:
         app.add_handler(handler.command_handler())
 
     # Add the message handler
-    app.add_handler(TextHandler().handler())
+    text_handler = TextHandler()
+    app.add_handler(text_handler.handler())
+
+    # Add the voice handler
+    app.add_handler(
+        VoiceHandler(
+            conversation_chain=text_handler.conversation_chain
+        ).handler()
+    )
 
     # Add the error handler
     app.add_error_handler(error_handler)

@@ -6,7 +6,7 @@ on:
 
 env:
   CONTAINER_REGISTRY: assistantbotcontainer
-  IMAGE_NAME: assitantbot
+  IMAGE_NAME: assistantbot
 
 jobs:
   build:

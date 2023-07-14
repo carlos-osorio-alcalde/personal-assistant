@@ -13,7 +13,6 @@ RUN pip install -r requirements.txt
 # Copy the current directory contents into the container at /app
 COPY assistantbot/ assistantbot/
 COPY main.py .
-COPY .env .
 
 # Run app.py when the container launches
 CMD ["python", "main.py"]
