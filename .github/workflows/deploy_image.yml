@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker buildx build --platform linux/amd64 -t ${{ env.IMAGE_NAME }} .
+          docker build --platform linux/amd64 -t ${{ env.IMAGE_NAME }} .
 
       - name: Log in to Container Registry
         run: |
