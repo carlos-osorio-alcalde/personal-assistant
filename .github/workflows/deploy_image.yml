@@ -1,15 +1,16 @@
-name: Deploy image on Azure Container Registry
+name: Deploy workflow
+
 on:
   push:
     branches:
-      - develop
+      - Develop
 
 env:
   CONTAINER_REGISTRY: assistantbotcontainer
   IMAGE_NAME: assistantbot
-
+  
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,17 +20,43 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Build Docker image
-        run: docker buildx build --platform linux/amd64 -t ${{ env.IMAGE_NAME }} .
-
       - name: Log in to Azure
-        run: az login --u ${{ secrets.AZURE_USERNAME }} --p ${{ secrets.AZURE_PASSWORD }}
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Log in to Azure Container Registry
-        run: az acr login --name ${{ env.CONTAINER_REGISTRY }}
+      - name: Build Docker image
+        run: |
+          docker buildx build --platform linux/amd64 -t ${{ env.IMAGE_NAME }} .
+
+      - name: Log in to Container Registry
+        run: |
+          az acr login --name ${{ env.CONTAINER_REGISTRY }}
 
       - name: Tag Docker image
-        run: docker tag ${{ env.IMAGE_NAME }} ${{ env.CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+        run: |
+          docker tag ${{ env.IMAGE_NAME }} ${{ env.CONTAINER_REGISTRY }}.azurecr.io//${{ env.IMAGE_NAME }}:latest
 
-      - name: Push Docker image to Azure Container Registry
-        run: docker push ${{ env.CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+      - name: Push Docker image to Container Registry
+        run: |
+          docker push ${{ env.CONTAINER_REGISTRY }}.azurecr.io//${{ env.IMAGE_NAME }}:latest
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/caaosorioal-assistant_key.pem
+          chmod 400 ~/.ssh/caaosorioal-assistant_key.pem
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Connect to VM and run commands
+        run: |
+          export CONTAINER_REGISTRY=assistantbotcontainer
+          export IMAGE_NAME=assistantbot
+          ssh -i ~/.ssh/caaosorioal-assistant_key.pem caaosorioal@20.232.103.192 "\
+            export CONTAINER_REGISTRY=assistantbotcontainer; \
+            export IMAGE_NAME=assistantbot; \
+            docker kill \$(docker ps -q); \
+            az acr login --name \$CONTAINER_REGISTRY; \
+            docker pull \$CONTAINER_REGISTRY.azurecr.io/\$IMAGE_NAME:latest; \
+            docker run -d --restart unless-stopped --env-file personal-assitant/.env \$CONTAINER_REGISTRY.azurecr.io/\$IMAGE_NAME:latest"
