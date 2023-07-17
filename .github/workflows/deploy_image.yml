@@ -47,6 +47,7 @@ jobs:
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           CONTAINER_REGISTRY: ${{ env.CONTAINER_REGISTRY }}
         with:
+          envs: IMAGE_NAME, CONTAINER_REGISTRY
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -59,7 +60,7 @@ jobs:
                   # Kill the running containers
                   docker kill $container_ids
                 fi
-                
+
                 az acr login --name $CONTAINER_REGISTRY; \
                 docker pull $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest; \
                 docker run -d --restart unless-stopped --env-file personal-assitant/.env $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest;
