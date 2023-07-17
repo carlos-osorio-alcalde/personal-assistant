@@ -8,6 +8,10 @@ on:
       - completed
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: ${{ vars.IMAGE_NAME }}
+  CONTAINER_REGISTRY: ${{ vars.CONTAINER_REGISTRY }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
