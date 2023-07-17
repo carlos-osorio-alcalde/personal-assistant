@@ -51,7 +51,15 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-                docker kill $(docker ps -q); \
+                # Get the IDs of all running containers
+                container_ids=$(docker ps -q)
+                
+                # Check if there are any running containers
+                if [[ -n "$container_ids" ]]; then
+                  # Kill the running containers
+                  docker kill $container_ids
+                fi
+                
                 az acr login --name $CONTAINER_REGISTRY; \
                 docker pull $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest; \
                 docker run -d --restart unless-stopped --env-file personal-assitant/.env $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest;
