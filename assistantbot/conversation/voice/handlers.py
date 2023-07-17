@@ -237,7 +237,8 @@ class VoiceHandler(ConversationHandler):
         if assessment_words_string == WORDS_PRONUNCIATION_ASSESSMENT_BASE:
             # If there are no words with a bad pronunciation, return only the
             # global assessment
-            assessment_words_string = "\n Nice! You pronounced all" \
-                                       " the words correctly!"
+            assessment_words_string = (
+                "\n Nice! You pronounced all" " the words correctly!"
+            )
 
         return assessment_global_string + assessment_words_string
