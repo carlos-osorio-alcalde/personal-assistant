@@ -36,7 +36,7 @@ def get_implemented_command_handlers() -> List[BaseCommand]:
     # Import all the implemented commands. This is done to avoid circular
     # imports.
     final_implemented_classes = []
-    for command in implemented_commands:
+    for command in sorted(implemented_commands, reverse=True):
         class_name_handler = (
             f"{command.replace('_', ' ').title().replace(' ', '')}Command"
         )

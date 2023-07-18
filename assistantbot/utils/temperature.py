@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Dict, Literal
+from typing import Dict, Literal, Union
 
 import requests
 from dotenv import load_dotenv
@@ -48,7 +48,41 @@ def is_configured_location(location) -> bool:
     return True if location in get_configured_locations(raw=False) else False
 
 
-def get_weather_conditions(city: Literal["med", "bog", "tul"]) -> Dict:
+def request_weather(
+    url: str, city: Literal["mde", "bog", "tul"]
+) -> Union[Dict, None]:
+    """
+    This function requests the weather from the OpenWeather API using the
+    specified url.
+
+    Parameters
+    ----------
+    url : str
+        The url to request the weather from.
+
+    Returns
+    -------
+    Dict
+        The response from the OpenWeather API.
+    """
+    temperature_locations_ = get_configured_locations(raw=True)
+
+    response = requests.get(
+        url.format(
+            lat=temperature_locations_[city]["lat"],
+            lon=temperature_locations_[city]["lon"],
+            api_key=os.getenv("OPEN_WEATHER_API_KEY"),
+        ),
+        timeout=config["TIMEOUT"],
+    )
+
+    if response.status_code != 200:
+        return None
+
+    return response.json()
+
+
+def get_weather_conditions(city: Literal["mde", "bog", "tul"]) -> Dict:
     """
     This function gets the current temperature in a city.
 
@@ -62,31 +96,18 @@ def get_weather_conditions(city: Literal["med", "bog", "tul"]) -> Dict:
     str
         The current temperature in the city.
     """
-    temperature_locations_ = get_configured_locations(raw=True)
-
     # Get the current temperature
     url = (
         "https://api.openweathermap.org/data/2.5/weather?"
         "lat={lat}&lon={lon}&units=metric&appid={api_key}"
     )
-    response = requests.get(
-        url.format(
-            lat=temperature_locations_[city]["lat"],
-            lon=temperature_locations_[city]["lon"],
-            api_key=os.getenv("OPEN_WEATHER_API_KEY"),
-        ),
-        timeout=config["TIMEOUT"],
-    )
 
-    if response.status_code != 200:
+    # Get the response
+    response = request_weather(url, city)
+
+    if response is not None:
         return {
-            "location": "",
-            "temperature": "",
-            "weather_status": "",
+            "location": get_configured_locations(raw=True)[city],
+            "temperature": f"{round(response['main']['temp'], 1)}",
+            "weather_status": response["weather"][0]["description"],
         }
-
-    return {
-        "location": temperature_locations_[city],
-        "temperature": response.json()["main"]["temp"],
-        "weather_status": response.json()["weather"][0]["description"],
-    }

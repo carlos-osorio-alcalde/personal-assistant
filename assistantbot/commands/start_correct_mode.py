@@ -101,7 +101,7 @@ class StartCorrectModeCommand(BaseCommand):
             states={
                 state_message: [
                     MessageHandler(
-                        filters.TEXT & (~filters.COMMAND),
+                        filters.TEXT & ~filters.COMMAND,
                         self._command_callback,
                     )
                 ]
