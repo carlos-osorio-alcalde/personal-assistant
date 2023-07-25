@@ -9,3 +9,5 @@ Random-Word == 1.0.11
 azure-cognitiveservices-speech == 1.30.0
 soundfile == 0.12.0
 spotipy == 2.23.0
+secure-smtplib == 0.1.1
+beautifulsoup4 == 4.12.2

@@ -1,6 +1,8 @@
 import imaplib
+import email
 import os
 from typing import List
+from email.message import Message
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -10,7 +12,7 @@ load_dotenv()
 class GmailClient:
     def __init__(self, email):
         self._email = email
-        self.conn = imaplib.IMAP4_SSL("imap.gmail.com")
+        self.conn = None
 
     def _connect(self, token: str) -> None:
         """
@@ -26,6 +28,7 @@ class GmailClient:
         imaplib.IMAP4_SSL or None
             The connection to the IMAP server. If the connection fails, None
         """
+        self.conn = imaplib.IMAP4_SSL("imap.gmail.com")
         try:
             self.conn.login(os.getenv("EMAIL"), token)
         except imaplib.IMAP4.error as e:
@@ -69,7 +72,7 @@ class GmailClient:
 
     def obtain_emails(
         self, email_from: str, most_recents_first: True, limit: int = None
-    ) -> List:
+    ) -> List[Message]:
         """
         This function obtains the emails from the specified email address.
 
@@ -88,7 +91,7 @@ class GmailClient:
 
         Returns
         -------
-        List
+        List[Message]
             The emails from the specified email address.
         """
         if self.conn is None:
@@ -96,18 +99,22 @@ class GmailClient:
 
         msgs_ids = self._obtain_emails_ids(email_from, most_recents_first)
         limit = len(msgs_ids) if limit is None else limit
-        msgs = [
-            self.conn.fetch(msg_id, "(RFC822)")[1][0][1].decode("utf-8")
-            for msg_id in msgs_ids[:limit]
-        ]
-        return msgs
+
+        messages = []
+        for message_id in msgs_ids[:limit]:
+            _, message_response = self.conn.fetch(message_id, "(RFC822)")
+            for response in message_response:
+                if isinstance(response, tuple):
+                    msg = email.message_from_bytes(response[1])
+                    messages.append(msg)
+
+        return messages
 
 
 if __name__ == "__main__":
     EMAIL_FROM = "alertasynotificaciones@notificacionesbancolombia.com"
 
     gmail_client = GmailClient(os.getenv("EMAIL"))
-    gmail_client._connect(os.getenv("GMAIL_TOKEN"))
     print(
         gmail_client.obtain_emails(
             EMAIL_FROM, most_recents_first=True, limit=3
