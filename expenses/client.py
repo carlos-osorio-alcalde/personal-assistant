@@ -1,8 +1,9 @@
-import imaplib
 import email
+import imaplib
 import os
-from typing import List
 from email.message import Message
+from typing import List
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -97,10 +98,12 @@ class GmailClient:
         if self.conn is None:
             self._connect(os.getenv("GMAIL_TOKEN"))
 
+        # Obtain the ids of the emails
         msgs_ids = self._obtain_emails_ids(email_from, most_recents_first)
         limit = len(msgs_ids) if limit is None else limit
 
         messages = []
+        # Loop over the ids of the emails and obtain the messages
         for message_id in msgs_ids[:limit]:
             _, message_response = self.conn.fetch(message_id, "(RFC822)")
             for response in message_response:
