@@ -58,7 +58,6 @@ def main() -> None:
 
     # Run the bot
     app.run_polling(
-        poll_interval=config["POLL_INTERVAL"],
         timeout=config["TIMEOUT"],
         allowed_updates=config["ALLOWED_UPDATES"],
         connect_timeout=config["TIMEOUT"],

@@ -9,7 +9,7 @@ class BaseCommand(ABC):
         self._command = None
 
     @abstractmethod
-    def command_callback(
+    async def command_callback(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         ...

@@ -1,23 +1,18 @@
 import time
 from assistantbot import bot
-import warnings
 from contextlib import contextmanager
 
 
-# Set the warnings to raise exceptions
-warnings.filterwarnings("error")
-
-
 @contextmanager
-def log_exception():
+def handle_expections():
     try:
         yield
-    except (RuntimeWarning, Exception) as e:
+    except (RuntimeWarning, Exception, RuntimeError) as e:
         bot.logger.exception(e)
         time.sleep(5)
 
 
 if __name__ == "__main__":
     while True:
-        with log_exception():
+        with handle_expections():
             bot.main()
