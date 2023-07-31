@@ -1,25 +1,18 @@
-from .email import TransactionEmail
-from typing import List, Tuple
+from abc import ABC, abstractmethod
 import re
-
-TRANSACTION_MESSAGES_TYPES_ = [
-    "Bancolombia le informa",
-    "Bancolombia te informa",
-    "Bancolombia informa",
-]
-
-TRANSACTION_TYPES_ = [
-    "Compra",
-    "Retiro",
-    "Pago",
-    "Recepcion transferencia",
-    "Retiro",
-]
+from expenses.email import TransactionEmail
+from expenses.processors.schemas import TransactionInfo
+from expenses.processors.constants import (
+    TRANSACTION_MESSAGES_TYPES_,
+    TRANSACTION_TYPES_,
+)
+from typing import List
 
 
-class TransactionEmailProcessor:
+class BaseEmailProcessor(ABC):
     def __init__(self, email: TransactionEmail):
         self.transaction_email_text = email.str_message
+        self.transaction_type = None
 
     @staticmethod
     def _has_valid_messages(messages: List[str], email_text: str) -> bool:
@@ -75,50 +68,40 @@ class TransactionEmailProcessor:
             and has_valid_amount
         )
 
-    def process_information(self) -> Tuple[str, str, str]:
+    @staticmethod
+    def convert_amount_to_float(value_str: str) -> float:
+        """
+        This static method converts a string amount to float.
+
+        Parameters
+        ----------
+        value_str : str
+            The string amount.
+
+        Returns
+        -------
+        float
+            The float amount.
+        """
+        value_str = "".join(
+            char for char in value_str if char.isdigit() or char in ",."
+        )
+
+        # TODO: Implement a better way to convert the amount to float
+        pass
+
+    @abstractmethod
+    def process(self) -> TransactionInfo:
         """
         This function processes the information of the email. It extracts the
         transaction type, the amount and the merchant.
 
         Returns
         -------
-        Tuple[str, str, str]
-            The transaction type, the amount and the merchant.
+        TransactionInfo
+            The transaction info schema.
         """
-        if not self._is_valid_email():
-            return None, None, None
-
-        # Regular expressions for different parts of the transaction string
-        # using the TRANSACTION_TYPES_
-        transaction_type_pattern = r"(?:{})".format(
-            "|".join(TRANSACTION_TYPES_)
-        )
-        amount_pattern = r"\$[\d,]+(?:\.\d+)?"
-        merchant_pattern = r"(?:\*[\d]+|[\w/.]+)"  # This is not correct.
-
-        # Extract transaction type
-        transaction_type_match = re.search(
-            transaction_type_pattern,
-            self.transaction_email_text,
-            re.IGNORECASE,
-        )
-        transaction_type = (
-            transaction_type_match.group(0).lower()
-            if transaction_type_match
-            else None
-        )
-
-        # Extract amount
-        amount_match = re.search(amount_pattern, self.transaction_email_text)
-        amount = amount_match.group(0) if amount_match else None
-
-        # Extract merchant
-        merchant_match = re.search(
-            merchant_pattern, self.transaction_email_text, re.IGNORECASE
-        )
-        merchant = merchant_match.group(0) if merchant_match else None
-
-        return transaction_type, amount, merchant
+        ...
 
 
 if __name__ == "__main__":
