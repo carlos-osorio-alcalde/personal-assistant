@@ -1,0 +1,2 @@
+from expenses.processors.transactions.purchase import PurchaseEmailProcessor
+from expenses.processors.transactions.transfer import TransferEmailProcessor

@@ -30,3 +30,6 @@ conversation/voice/temp/*.wav
 
 # Ignore the .DS_Store files
 **/.DS_Store
+
+# Ignore the test script
+expenses/test.py
