@@ -1,13 +1,37 @@
+import importlib
+from typing import Dict
+
 from expenses.constants import TRANSACTION_TYPES_
-import expenses.processors.transactions as transactions_processors
 from expenses.email import TransactionEmail
 from expenses.processors.base import EmailProcessor
 
-# Transaction types and their corresponding processors
-TRANSACTIONS_PROCESSORS_ = {
-    "Compra": transactions_processors.PurchaseEmailProcessor,
-    "Recepcion transferencia": transactions_processors.TransferEmailProcessor,
-}
+
+def import_processors() -> Dict[str, EmailProcessor]:
+    """
+    This function imports the processors of the transactions. It returns a
+    dictionary with the transaction type and the corresponding processor.
+
+    Returns
+    -------
+    Dict[str, EmailProcessor]
+        The dictionary with the transaction type and the corresponding
+        processor.
+    """
+    implemented_processors = {
+        transaction: getattr(
+            importlib.import_module(
+                f"expenses.processors.{implementation['module_name']}"
+            ),
+            implementation["class_name"],
+        )
+        for transaction, implementation in TRANSACTION_TYPES_.items()
+        if implementation["implemented"]
+    }
+    return implemented_processors
+
+
+# Get the processors of the transactions.
+TRANSACTIONS_PROCESSORS_ = import_processors()
 
 
 class EmailProcessorFactory:
@@ -47,5 +71,5 @@ class EmailProcessorFactory:
             return TRANSACTIONS_PROCESSORS_[transaction_type](email)
         else:
             raise ValueError(
-                f"The transaction type {transaction_type} is not supported."
+                f"The transaction type {transaction_type} is not supported"
             )

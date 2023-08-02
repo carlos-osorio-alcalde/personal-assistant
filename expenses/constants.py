@@ -2,12 +2,36 @@ TRANSACTION_MESSAGES_TYPES_ = [
     "Bancolombia le informa",
     "Bancolombia te informa",
     "Bancolombia informa",
+    "Realizaste una transferencia",
 ]
 
-TRANSACTION_TYPES_ = [
-    "Compra",
-    "Retiro",
-    "Pago",
-    "Recepcion transferencia",
-    "Retiro",
-]
+
+# This is the dictionary that contains the transaction types and their
+# corresponding processors.
+TRANSACTION_TYPES_ = {
+    "Compra": {
+        "module_name": "transactions.purchase",
+        "class_name": "PurchaseEmailProcessor",
+        "implemented": True,
+    },
+    "Retiro": {
+        "module_name": "transactions.withdrawal",
+        "class_name": "WithdrawalEmailProcessor",
+        "implemented": True,
+    },
+    "Pago": {
+        "module_name": "ptransactions.ayment",
+        "class_name": "PaymentEmailProcessor",
+        "implemented": False,
+    },
+    "recepcion transferencia": {
+        "module_name": "transactions.transfer",
+        "class_name": "TransferEmailProcessor",
+        "implemented": True,
+    },
+    "QR": {
+        "module_name": "transactions.transfer_qr",
+        "class_name": "QREmailProcessor",
+        "implemented": True,
+    },
+}

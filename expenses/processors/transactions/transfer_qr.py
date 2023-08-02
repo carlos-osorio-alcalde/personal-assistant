@@ -2,21 +2,20 @@ from expenses.email import TransactionEmail
 from expenses.processors.base import EmailProcessor
 
 
-class TransferEmailProcessor(EmailProcessor):
+class QREmailProcessor(EmailProcessor):
     """
-    This is the class that processes the emails of the transaction type
-    "Recepcion transferencia"
+    This is the processor of the QR transaction emails.
 
     Here's an example of the email:
 
-    Bancolombia te informa recepcion transferencia de PEDRO PEREZ por
-    $999,999 en la cuenta *9999. 31/07/2023 09:04. Dudas 018000931987
+    Realizaste una transferencia con QR por $999,9999.00, desde cta 9999
+    a cta 0000. 29/07/2023 03:06. Dudas al 018000931987. Bancolombia
 
     """
 
     def __init__(self, email: TransactionEmail):
         super().__init__(email)
-        self.transaction_type = "Transferencia"
+        self.transaction_type = "QR"
 
     def _set_pattern(self) -> str:
         """
@@ -28,8 +27,8 @@ class TransferEmailProcessor(EmailProcessor):
             The pattern of the transaction type.
         """
         pattern = (
-            r"recepcion transferencia de (?P<merchant>.*?) "
-            r"por (?P<purchase_amount>.*?) "
-            r"en la cuenta \*(?P<payment_method>\d{4}). "
+            r"transferencia con QR por (?P<purchase_amount>.*?), "
+            r"desde cta (?P<payment_method>\d+) a cta (?P<merchant>\d+)."
+            r" (?P<datetime>\d{2}/\d{2}/\d{4} \d{2}:\d{2})."
         )
         return pattern

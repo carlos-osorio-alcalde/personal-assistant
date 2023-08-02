@@ -1,5 +1,6 @@
+import re
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Dict, List
 
 from expenses.constants import (
     TRANSACTION_MESSAGES_TYPES_,
@@ -10,13 +11,38 @@ from expenses.processors.schemas import TransactionInfo
 
 
 class EmailProcessor(ABC):
+    """
+    Abstract class to define the email processor.
+
+    These are the attributes:
+        - email: The email object.
+        - transaction_email_text: The string email.
+        - transaction_type: The transaction type.
+        - pattern: The regex pattern to extract the transaction information.
+    """
+
     def __init__(self, email: TransactionEmail):
         self.email = email
-        self.transaction_email_text = self.email.str_message
-        self.transaction_type = None
+        self.transaction_email_text: str = self.email.str_message
+        self.transaction_type: str = None
+        self.pattern: str = self._set_pattern()
 
     def __str__(self):
         return f"{self.__class__.__name__}"
+
+    @abstractmethod
+    def _set_pattern(self) -> str:
+        """
+        This abstract method sets the regex pattern to extract the
+        transaction information.
+        This method must be implemented in the child classes.
+
+        Returns
+        -------
+        str
+            The regex pattern.
+        """
+        ...
 
     @staticmethod
     def _has_valid_messages(messages: List[str], email_text: str) -> bool:
@@ -36,7 +62,11 @@ class EmailProcessor(ABC):
         bool
             True if the email contains some of the messages, False otherwise.
         """
-        return any(message in email_text for message in messages)
+        return any(
+            (message in email_text)
+            or (message.lower() in email_text.lower())
+            for message in messages
+        )
 
     def _is_valid_email(self) -> bool:
         """
@@ -59,7 +89,7 @@ class EmailProcessor(ABC):
 
         # Check if the string email contains some of the transaction types
         has_valid_transaction_type = self._has_valid_messages(
-            TRANSACTION_TYPES_, self.transaction_email_text
+            list(TRANSACTION_TYPES_.keys()), self.transaction_email_text
         )
 
         # Check if the string email contains an amount with "$"
@@ -73,7 +103,7 @@ class EmailProcessor(ABC):
         )
 
     @staticmethod
-    def convert_amount_to_float(value_str: str) -> float:
+    def _convert_amount_to_float(value_str: str) -> float:
         """
         This static method converts a string amount to float.
         There are several possible formats for the amount:
@@ -105,7 +135,56 @@ class EmailProcessor(ABC):
         value_str = value_str.replace(",", "").replace(".", "")
         return float(value_str)
 
-    @abstractmethod
+    def _get_match(self) -> re.Match:
+        """
+        This function returns the match object of the transaction type.
+
+        Returns
+        -------
+        re.Match
+            The match object.
+        """
+        return re.search(self.pattern, self.transaction_email_text)
+
+    def _get_transaction_values(self) -> Dict:
+        """
+        This function returns the transaction values.
+
+        Returns
+        -------
+        Dict
+            The transaction values in a dictionary.
+        """
+        if self._is_valid_email():
+            # Get the match object
+            match = self._get_match()
+
+            # Obtain the elements of the match object
+            purchase_amount = (
+                match.group("purchase_amount") if match else "$0.0"
+            )
+            merchant = match.group("merchant") if match else "unknown"
+            paynment_method = (
+                match.group("payment_method") if match else "unknown"
+            )
+            log_email_string = None
+        else:
+            # If the email is not valid, set the default values and log the
+            # email.
+            purchase_amount = "$0.0"
+            merchant = "unknown"
+            paynment_method = "unknown"
+            log_email_string = self.transaction_email_text
+
+        return {
+            "transaction_type": self.transaction_type,
+            "amount": self._convert_amount_to_float(purchase_amount),
+            "merchant": merchant,
+            "datetime": self.email.date_message,
+            "paynment_method": paynment_method,
+            "email_log": log_email_string,
+        }
+
     def process(self) -> TransactionInfo:
         """
         This function processes the information of the email. It extracts the
@@ -116,8 +195,4 @@ class EmailProcessor(ABC):
         TransactionInfo
             The transaction info schema.
         """
-        ...
-
-
-if __name__ == "__main__":
-    pass
+        return TransactionInfo(**self._get_transaction_values())

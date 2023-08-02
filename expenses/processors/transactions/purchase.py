@@ -1,43 +1,40 @@
-import re
-
 from expenses.email import TransactionEmail
 from expenses.processors.base import EmailProcessor
-from expenses.processors.schemas import TransactionInfo
 
 
 class PurchaseEmailProcessor(EmailProcessor):
+    """
+    This class is the processor of the transaction type "Compra".
+
+    Here are some examples of the emails:
+
+    Bancolombia le informa Compra por $999.999,00 en ESTABLECIMIENTO 19:45.
+    31/07/2023 T.Cred *9999. Inquietudes al 6045109095/018000931987.
+
+    Bancolombia le informa compra por $999.999,00 en ESTABLECIMIENTO 13:25.
+    01/08/2023 compra afiliada a T.Cred *9999.
+    Inquietudes al 6045109095/01800931987.
+
+    """
+
     def __init__(self, email: TransactionEmail):
         super().__init__(email)
-        self.type_transaction = "Compra"
+        self.transaction_type = "Compra"
 
-    def process(self) -> TransactionInfo:
+    def _set_pattern(self) -> str:
         """
-        This function processes the information of the email. It extracts the
-        transaction type, the amount and the merchant.
+        This function sets the pattern of the transaction type.
 
         Returns
         -------
-        TransactionInfo
-            The transaction information.
+        str
+            The pattern of the transaction type.
         """
-        if not self._is_valid_email():
-            return None, None, None
-
         pattern = (
-            r"Compra por (?P<purchase_amount>.*?) en (?P<merchant>.*?)"
-            r"(?: (?P<time>\d{2}:\d{2}). (?P<date>\d{2}/\d{2}/\d{4}))?"
-            r" (?P<payment_method>T.(?:Cred|Deb) \*\d+)."
+            r"(?i)Compra por (?P<purchase_amount>.*?) "
+            r"en (?P<merchant>[\w\s.*\/]+)"
+            r"(?: (?P<time>\d{2}:\d{2}). (?P<date>\d{2}/\d{2}/\d{4}))"
+            r"(?i)(?: (?P<payment_method>(?:T\.Cred|T\.Deb|compra afiliada"
+            r" a T\.Cred) \*\d+))?"
         )
-        match = re.search(pattern, self.transaction_email_text)
-        if match:
-            purchase_amount = match.group("purchase_amount")
-            merchant = match.group("merchant")
-            paynment_method = match.group("payment_method")
-
-        return TransactionInfo(
-            transaction_type=self.type_transaction,
-            amount=self.convert_amount_to_float(purchase_amount),
-            merchant=merchant,
-            datetime=self.email.date_message,
-            paynment_method=paynment_method,
-        )
+        return pattern

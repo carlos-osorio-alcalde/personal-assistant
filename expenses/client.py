@@ -11,6 +11,10 @@ load_dotenv()
 
 
 class GmailClient:
+    """
+    This class is the client to connect to the Gmail server.
+    It allows to obtain the emails from the specified email address.
+    """
     def __init__(self, email):
         self._email = email
         self.conn = None
@@ -112,14 +116,3 @@ class GmailClient:
                     messages.append(msg)
 
         return messages
-
-
-if __name__ == "__main__":
-    EMAIL_FROM = "alertasynotificaciones@notificacionesbancolombia.com"
-
-    gmail_client = GmailClient(os.getenv("EMAIL"))
-    print(
-        gmail_client.obtain_emails(
-            EMAIL_FROM, most_recents_first=True, limit=3
-        )
-    )
