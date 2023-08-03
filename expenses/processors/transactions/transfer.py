@@ -17,6 +17,7 @@ class TransferEmailProcessor(EmailProcessor):
     def __init__(self, email: TransactionEmail):
         super().__init__(email)
         self.transaction_type = "Transferencia"
+        self._is_income = True
 
     def _set_pattern(self) -> str:
         """

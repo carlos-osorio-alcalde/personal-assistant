@@ -10,6 +10,7 @@ class TransactionEmail:
     This class is a wrapper of the email object from the email library.
     Is intended to be used to extract the transaction message from the email.
     """
+
     def __init__(self, email: Message):
         self.body_email = email
         self.date_message: datetime = self.get_date_message()

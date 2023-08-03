@@ -20,6 +20,7 @@ class PurchaseEmailProcessor(EmailProcessor):
     def __init__(self, email: TransactionEmail):
         super().__init__(email)
         self.transaction_type = "Compra"
+        self._is_income = False
 
     def _set_pattern(self) -> str:
         """

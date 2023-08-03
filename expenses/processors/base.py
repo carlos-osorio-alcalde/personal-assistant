@@ -25,6 +25,7 @@ class EmailProcessor(ABC):
         self.email = email
         self.transaction_email_text: str = self.email.str_message
         self.transaction_type: str = None
+        self._is_income: bool = None
         self.pattern: str = self._set_pattern()
 
     def __str__(self):
@@ -178,7 +179,9 @@ class EmailProcessor(ABC):
 
         return {
             "transaction_type": self.transaction_type,
-            "amount": self._convert_amount_to_float(purchase_amount),
+            "amount": self._convert_amount_to_float(purchase_amount)
+            if self._is_income
+            else -self._convert_amount_to_float(purchase_amount),
             "merchant": merchant,
             "datetime": self.email.date_message,
             "paynment_method": paynment_method,

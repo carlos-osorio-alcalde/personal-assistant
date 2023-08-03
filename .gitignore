@@ -33,3 +33,7 @@ conversation/voice/temp/*.wav
 
 # Ignore the test script
 expenses/test.py
+
+# Ignore the .env files
+**/.env
+**/.accesapi.env

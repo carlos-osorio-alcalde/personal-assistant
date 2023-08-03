@@ -1,0 +1,98 @@
+import datetime
+import os
+from collections import defaultdict
+from typing import List
+
+from expenses.api.schemas.expenses import (
+    BaseTransactionInfo,
+    SummaryTransactionInfo,
+)
+from expenses.client import GmailClient
+from expenses.email import TransactionEmail
+from expenses.processors.factory import EmailProcessorFactory
+from expenses.processors.schemas import TransactionInfo
+
+EMAIL_FROM = "alertasynotificaciones@notificacionesbancolombia.com"
+
+
+def get_transactions(
+    date_to_search: datetime.datetime,
+) -> List[TransactionInfo]:
+    """
+    This function obtains the transactions from the specified email address
+    and returns the list of the information for all the transactions.
+
+    Parameters
+    ----------
+    date_to_search : datetime.datetime
+        The date to obtain the transactions from.
+
+    Returns
+    -------
+    List[TransactionInfo]
+        The list of the information for all the transactions.
+    """
+    gmail_client = GmailClient(os.getenv("EMAIL"))
+    emails_list = gmail_client.obtain_emails(
+        EMAIL_FROM,
+        most_recents_first=True,
+        limit=None,
+        date_to_search=date_to_search,
+    )
+
+    transactions = []
+    processor_factory = EmailProcessorFactory()
+    for email in emails_list:
+        try:
+            transactions.append(
+                processor_factory.get_processor(
+                    TransactionEmail(email)
+                ).process()
+            )
+        except ValueError:
+            continue
+
+    return transactions
+
+
+def process_transactions_api(
+    transactions: List[TransactionInfo],
+) -> SummaryTransactionInfo:
+    """
+    This function processes the transactions and returns the summary of the
+    transactions.
+
+    Parameters
+    ----------
+    transactions : List[TransactionInfo]
+        The list of the information for all the transactions.
+
+    Returns
+    -------
+    SummaryTransactionInfo
+        The summary of the transactions.
+    """
+
+    summary = SummaryTransactionInfo(
+        purchases=BaseTransactionInfo(amount=0, count=0),
+        withdrawals=BaseTransactionInfo(amount=0, count=0),
+        transfer=BaseTransactionInfo(amount=0, count=0),
+        transfer_qr=BaseTransactionInfo(amount=0, count=0),
+    )
+
+    transaction_summary = defaultdict(
+        lambda: BaseTransactionInfo(amount=0, count=0)
+    )
+
+    for transaction in transactions:
+        transaction_summary[
+            transaction.transaction_type
+        ].amount += transaction.amount
+        transaction_summary[transaction.transaction_type].count += 1
+
+    summary.purchases = transaction_summary["Compra"]
+    summary.withdrawals = transaction_summary["Retiro"]
+    summary.transfer = transaction_summary["Transferencia"]
+    summary.transfer_qr = transaction_summary["QR"]
+
+    return summary
