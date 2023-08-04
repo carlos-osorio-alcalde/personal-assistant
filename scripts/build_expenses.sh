@@ -1,0 +1,1 @@
+docker build -t expenses-api --platform linux/amd64 -f expenses/Dockerfile . 

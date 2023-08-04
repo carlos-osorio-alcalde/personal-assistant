@@ -61,3 +61,6 @@ async def check_access_token(
 
     except JWTError:
         raise credentials_exception
+
+if __name__ == "__main__":
+    print(create_access_token())

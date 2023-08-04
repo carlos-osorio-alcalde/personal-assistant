@@ -8,7 +8,7 @@ from expenses.api.schemas.expenses import (
     SummaryTransactionInfo,
 )
 from expenses.client import GmailClient
-from expenses.email import TransactionEmail
+from expenses.transaction_email import TransactionEmail
 from expenses.processors.factory import EmailProcessorFactory
 from expenses.processors.schemas import TransactionInfo
 

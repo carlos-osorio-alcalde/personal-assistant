@@ -8,7 +8,6 @@ assistant/
 **/__pycache__/
 
 # Ignore the .vscode folder
-.vscode/
 
 # Ignore .pem files
 **/*.pem
@@ -36,4 +35,5 @@ expenses/test.py
 
 # Ignore the .env files
 **/.env
+**/.docker.env
 **/.accesapi.env

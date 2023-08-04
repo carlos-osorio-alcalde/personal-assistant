@@ -6,7 +6,7 @@ from expenses.constants import (
     TRANSACTION_MESSAGES_TYPES_,
     TRANSACTION_TYPES_,
 )
-from expenses.email import TransactionEmail
+from expenses.transaction_email import TransactionEmail
 from expenses.processors.schemas import TransactionInfo
 
 
