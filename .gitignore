@@ -37,3 +37,7 @@ expenses/test.py
 **/.env
 **/.docker.env
 **/.accesapi.env
+**/.expenses.env
+
+# Ignore the azure_test_function path
+azure_test_function/
