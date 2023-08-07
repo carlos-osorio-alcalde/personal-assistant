@@ -20,9 +20,9 @@ TRANSACTION_TYPES_ = {
         "implemented": True,
     },
     "Pago": {
-        "module_name": "ptransactions.ayment",
+        "module_name": "transactions.payment",
         "class_name": "PaymentEmailProcessor",
-        "implemented": False,
+        "implemented": True,
     },
     "recepcion transferencia": {
         "module_name": "transactions.transfer",

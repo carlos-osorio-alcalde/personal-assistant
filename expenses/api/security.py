@@ -5,7 +5,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBasicCredentials, HTTPBearer
 from jose import JWTError, jwt
 
-load_dotenv(dotenv_path="expenses/.env")
+# Check if the file exists
+if os.path.exists("expenses/.env"):
+    load_dotenv(dotenv_path="expenses/.env")
 
 
 def create_access_token() -> str:

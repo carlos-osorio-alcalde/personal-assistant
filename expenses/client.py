@@ -7,8 +7,9 @@ from typing import List, Optional
 
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv(dotenv_path="expenses/.env")
+# Check if the file exists
+if os.path.exists("expenses/.env"):
+    load_dotenv(dotenv_path="expenses/.env")
 
 
 class GmailClient:
