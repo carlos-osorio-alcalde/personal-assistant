@@ -41,3 +41,6 @@ expenses/test.py
 
 # Ignore the azure_test_function path
 azure_test_function/
+
+# Ignore the folder expenses/api/database since it is used for testing
+expenses/api/database/

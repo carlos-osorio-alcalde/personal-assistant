@@ -1,5 +1,6 @@
 from expenses.api.utils.dates import get_date_from_search  # noqa
-from expenses.api.utils.transactions import (
+from expenses.api.utils.transactions import (  # noqa
     get_transactions,  # noqa
-    process_transactions_api,
+    process_transactions_api,  # noqa
 )
+from expenses.api.utils.database import get_cursor  # noqa

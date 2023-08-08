@@ -2,7 +2,7 @@ import importlib
 from typing import Dict
 
 from expenses.constants import TRANSACTION_TYPES_
-from expenses.transaction_email import TransactionEmail
+from expenses.core.transaction_email import TransactionEmail
 from expenses.processors.base import EmailProcessor
 
 

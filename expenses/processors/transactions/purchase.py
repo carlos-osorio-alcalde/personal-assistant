@@ -1,4 +1,4 @@
-from expenses.transaction_email import TransactionEmail
+from expenses.core.transaction_email import TransactionEmail
 from expenses.processors.base import EmailProcessor
 
 

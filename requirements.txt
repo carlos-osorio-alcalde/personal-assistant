@@ -14,3 +14,4 @@ secure-smtplib == 0.1.1
 beautifulsoup4 == 4.12.2
 python-jose == 3.3.0
 azure-functions == 1.15.0
+pyodbc == 4.0.39

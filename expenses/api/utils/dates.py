@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from typing import Literal
 
 
@@ -18,7 +19,8 @@ def get_date_from_search(
     datetime.datetime
         The date to search the emails from.
     """
-    now = datetime.datetime.now()
+    timezone = pytz.timezone("America/Bogota")
+    now = datetime.datetime.now().astimezone(timezone)
 
     if timeframe == "daily":
         date_to_search = now
