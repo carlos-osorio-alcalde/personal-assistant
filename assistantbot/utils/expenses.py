@@ -1,20 +1,21 @@
 import requests
 from dotenv import load_dotenv
 import os
-import json
 from typing import Literal
 
 # Load environment variables
 load_dotenv()
 
 
-def get_expenses(timeframe: Literal["daily", "weekly"]) -> str:
+def get_expenses(
+    timeframe: Literal["daily", "weekly", "partial_weekly", "monthly"]
+) -> str:
     """
     This function returns the summary of the expenses of the day or the week
 
     Parameters
     ----------
-    timeframe : Literal["daily", "weekly"]
+    timeframe : Literal["daily", "weekly", "partial_weekly", "monthly"]
         The timeframe to obtain the expenses from.
 
     Returns
@@ -34,7 +35,17 @@ def get_expenses(timeframe: Literal["daily", "weekly"]) -> str:
         return "Ups, something went wrong."
 
     # Convert the json to a string
-    return json.dumps(response.json(), indent=2, sort_keys=True)
+    expenses = response.json()
+    expenses_str = ""
+    for _, values_expenses in expenses.items():
+        if values_expenses["name"]:
+            expenses_str += (
+                f"{values_expenses['name']}, "
+                f"amount: ${values_expenses['amount']}, "
+                f"count: {values_expenses['count']} \n"
+            )
+
+    return expenses_str
 
 
 if __name__ == "__main__":
