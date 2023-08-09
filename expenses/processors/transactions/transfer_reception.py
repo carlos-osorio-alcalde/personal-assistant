@@ -2,23 +2,22 @@ from expenses.core.transaction_email import TransactionEmail
 from expenses.processors.base import EmailProcessor
 
 
-class TransferEmailProcessor(EmailProcessor):
+class TransferReceptionEmailProcessor(EmailProcessor):
     """
     This is the class that processes the emails of the transaction type
     "Recepcion transferencia"
 
     Here's an example of the email:
 
-    Bancolombia le informa Transferencia por $999,9999 desde cta *9999 a
-    cta 999999999999. 08/08/2023 19:30.
-    Inquietudes al 6045109095/018000931987.
+    Bancolombia te informa recepcion transferencia de PEDRO PEREZ por
+    $999,999 en la cuenta *9999. 31/07/2023 09:04. Dudas 018000931987
 
     """
 
     def __init__(self, email: TransactionEmail):
         super().__init__(email)
-        self.transaction_type = "Transferencia"
-        self._is_income = False
+        self.transaction_type = "Recepcion Transferencia"
+        self._is_income = True
 
     def _set_pattern(self) -> str:
         """
@@ -30,8 +29,8 @@ class TransferEmailProcessor(EmailProcessor):
             The pattern of the transaction type.
         """
         pattern = (
-            r"Transferencia por (?P<purchase_amount>.*?) "
-            r"desde cta (?:\*(?P<payment_method>\d+))? a "
-            r"cta (?P<merchant>\d+)"
+            r"recepcion transferencia de (?P<merchant>.*?) "
+            r"por (?P<purchase_amount>.*?) "
+            r"en la cuenta \*(?P<payment_method>\d{4}). "
         )
         return pattern

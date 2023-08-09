@@ -76,9 +76,10 @@ def process_transactions_api(
     summary = SummaryTransactionInfo(
         purchases=BaseTransactionInfo(amount=0, count=0),
         withdrawals=BaseTransactionInfo(amount=0, count=0),
-        transfer=BaseTransactionInfo(amount=0, count=0),
+        transfer_reception=BaseTransactionInfo(amount=0, count=0),
         transfer_qr=BaseTransactionInfo(amount=0, count=0),
         payment=BaseTransactionInfo(amount=0, count=0),
+        transfer=BaseTransactionInfo(amount=0, count=0),
     )
 
     transaction_summary = defaultdict(
@@ -93,8 +94,11 @@ def process_transactions_api(
 
     summary.purchases = transaction_summary["Compra"]
     summary.withdrawals = transaction_summary["Retiro"]
-    summary.transfer = transaction_summary["Transferencia"]
+    summary.transfer_reception = transaction_summary[
+        "Recepcion Transferencia"
+    ]
     summary.transfer_qr = transaction_summary["QR"]
     summary.payment = transaction_summary["Pago"]
+    summary.transfer = transaction_summary["Transferencia"]
 
     return summary

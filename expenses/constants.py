@@ -25,13 +25,18 @@ TRANSACTION_TYPES_ = {
         "implemented": True,
     },
     "recepcion transferencia": {
-        "module_name": "transactions.transfer",
-        "class_name": "TransferEmailProcessor",
+        "module_name": "transactions.transfer_reception",
+        "class_name": "TransferReceptionEmailProcessor",
         "implemented": True,
     },
     "QR": {
         "module_name": "transactions.transfer_qr",
         "class_name": "QREmailProcessor",
+        "implemented": True,
+    },
+    "Transferencia": {
+        "module_name": "transactions.transfer",
+        "class_name": "TransferEmailProcessor",
         "implemented": True,
     },
 }

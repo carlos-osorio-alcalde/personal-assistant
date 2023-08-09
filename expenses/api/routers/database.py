@@ -1,15 +1,16 @@
+import os
 from typing import Literal
+
+from dotenv import load_dotenv
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
+
+from expenses.api.security import check_access_token
 from expenses.api.utils import (
+    get_cursor,
     get_date_from_search,
     get_transactions,
-    get_cursor,
 )
-from expenses.api.security import check_access_token
-import os
-from dotenv import load_dotenv
-
 
 router = APIRouter(prefix="/database")
 
@@ -35,7 +36,7 @@ def test_connection() -> str:
         cursor.execute("SELECT TOP 1 * FROM transactions")
         rows = cursor.fetchall()
         cursor.close()
-        return f"Connection successful. + {str(rows)}"
+        return f"Connection successful. This is the first row: {str(rows)}"
     except Exception:
         raise HTTPException(status_code=500, detail="Connection failed.")
 
@@ -92,6 +93,7 @@ def populate_table(
 
         try:
             for values in insert_values:
+                print(values)
                 cursor.execute(
                     """
                     INSERT INTO transactions
@@ -111,19 +113,17 @@ def populate_table(
                             amount = ? AND
                             merchant = ? AND
                             datetime = ? AND
-                            payment_method = ? AND
-                            email_log_id = ?
+                            payment_method = ?
                     )
                     """,
-                    values + values,
+                    values + values[:-1],
                 )
-            cursor.commit()
+                cursor.commit()
+
+            cursor.close()
         except Exception:
             raise HTTPException(status_code=500, detail="Insertion failed.")
 
         return "Table populated successfully."
     except Exception:
         raise HTTPException(status_code=500, detail="Connection failed.")
-
-    finally:
-        cursor.close()

@@ -8,6 +8,7 @@ from expenses.api.security import check_access_token
 from expenses.api.utils import (
     get_date_from_search,
     get_transactions,
+    get_transactions_from_database,
     process_transactions_api,
 )
 
@@ -48,7 +49,15 @@ async def get_expenses(
     # Get the date to search
     date_to_search = get_date_from_search(timeframe)
 
-    # Process the transactions
-    transactions = get_transactions(date_to_search)
+    # Search in the database for the transactions
+    transactions_from_db = get_transactions_from_database(date_to_search)
+
+    # If there are not transactions in the database, search in the API
+    # and process the transactions.
+    transactions = (
+        transactions_from_db
+        if transactions_from_db
+        else get_transactions(date_to_search)
+    )
 
     return process_transactions_api(transactions)

@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI
 
-from expenses.api.routers.expenses import router as expenses_router
 from expenses.api.routers.database import router as connection_router
+from expenses.api.routers.expenses import router as expenses_router
 from expenses.api.security import check_access_token
 
 # Define the FastAPI app

@@ -18,6 +18,7 @@ class SummaryTransactionInfo(BaseModel):
 
     purchases: BaseTransactionInfo
     withdrawals: BaseTransactionInfo
-    transfer: BaseTransactionInfo
+    transfer_reception: BaseTransactionInfo
     transfer_qr: BaseTransactionInfo
     payment: BaseTransactionInfo
+    transfer: BaseTransactionInfo
