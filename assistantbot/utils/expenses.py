@@ -34,7 +34,11 @@ def get_expenses(timeframe: Literal["daily", "weekly"]) -> str:
         return "Ups, something went wrong."
 
     # Convert the json to a string
-    return json.dumps(response.json(), indent=2, sort_keys=True)
+    expenses = response.json()
+    expenses_str = ""
+    for expense in expenses:
+        expenses_str += f"{expense['name']} - ${expense['amount']}\n"
+
 
 
 if __name__ == "__main__":
