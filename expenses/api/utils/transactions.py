@@ -74,24 +74,30 @@ def process_transactions_api(
     """
 
     summary = SummaryTransactionInfo(
-        purchases=BaseTransactionInfo(amount=0, count=0),
-        withdrawals=BaseTransactionInfo(amount=0, count=0),
-        transfer_reception=BaseTransactionInfo(amount=0, count=0),
-        transfer_qr=BaseTransactionInfo(amount=0, count=0),
-        payment=BaseTransactionInfo(amount=0, count=0),
-        transfer=BaseTransactionInfo(amount=0, count=0),
+        purchases=BaseTransactionInfo(name="", amount=0, count=0),
+        withdrawals=BaseTransactionInfo(name="", amount=0, count=0),
+        transfer_reception=BaseTransactionInfo(name="", amount=0, count=0),
+        transfer_qr=BaseTransactionInfo(name="", amount=0, count=0),
+        payment=BaseTransactionInfo(name="", amount=0, count=0),
+        transfer=BaseTransactionInfo(name="", amount=0, count=0),
     )
 
     transaction_summary = defaultdict(
-        lambda: BaseTransactionInfo(amount=0, count=0)
+        lambda: BaseTransactionInfo(name="", amount=0, count=0)
     )
 
     for transaction in transactions:
         transaction_summary[
             transaction.transaction_type
+        ].name = transaction.transaction_type
+
+        transaction_summary[
+            transaction.transaction_type
         ].amount += transaction.amount
+
         transaction_summary[transaction.transaction_type].count += 1
 
+    # Set the values of the summary
     summary.purchases = transaction_summary["Compra"]
     summary.withdrawals = transaction_summary["Retiro"]
     summary.transfer_reception = transaction_summary[

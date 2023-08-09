@@ -6,6 +6,7 @@ class BaseTransactionInfo(BaseModel):
     This class represents the base of the transaction info.
     """
 
+    name: str | None
     amount: float | None
     count: int | None
 
