@@ -55,7 +55,7 @@ def get_transactions(
     return transactions
 
 
-def process_transactions_api(
+def process_transactions_api_expenses(
     transactions: List[TransactionInfo],
 ) -> SummaryTransactionInfo:
     """

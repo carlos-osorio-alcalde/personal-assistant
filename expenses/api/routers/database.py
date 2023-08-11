@@ -5,10 +5,12 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 
+from expenses.api.schemas import AddTransactionInfo
 from expenses.api.security import check_access_token
 from expenses.api.utils import (
     get_cursor,
     get_date_from_search,
+    get_query_to_insert_values,
     get_transactions,
 )
 
@@ -41,8 +43,8 @@ def test_connection() -> str:
         raise HTTPException(status_code=500, detail="Connection failed.")
 
 
-@router.get(
-    "/populate_table/{timeframe}", dependencies=[Depends(check_access_token)]
+@router.post(
+    "/populate_table/", dependencies=[Depends(check_access_token)]
 )
 def populate_table(
     timeframe: Literal["daily", "weekly", "partial_weekly", "monthly"]
@@ -93,30 +95,8 @@ def populate_table(
 
         try:
             for values in insert_values:
-                print(values)
                 cursor.execute(
-                    """
-                    INSERT INTO transactions
-                    (
-                        transaction_type,
-                        amount,
-                        merchant,
-                        datetime,
-                        payment_method,
-                        email_log_id
-                    )
-                    SELECT ?, ?, ?, ?, ?, ?
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM transactions
-                        WHERE
-                            transaction_type = ? AND
-                            amount = ? AND
-                            merchant = ? AND
-                            datetime = ? AND
-                            payment_method = ?
-                    )
-                    """,
-                    values + values[:-1],
+                    get_query_to_insert_values(), values + values[:-1]
                 )
                 cursor.commit()
 
@@ -125,5 +105,55 @@ def populate_table(
             raise HTTPException(status_code=500, detail="Insertion failed.")
 
         return "Table populated successfully."
+    except Exception:
+        raise HTTPException(status_code=500, detail="Connection failed.")
+
+
+@router.post("/add_transaction", dependencies=[Depends(check_access_token)])
+async def add_transaction(transaction: AddTransactionInfo) -> str:
+    """
+    This function adds a transaction to the database.
+
+    Parameters
+    ----------
+    transaction : AddTransactionInfo
+        The transaction to add.
+
+    Returns
+    -------
+    str
+        A message indicating the status of the connection.
+    """
+    try:
+        # Establish the connection
+        cursor = get_cursor()
+
+        if transaction.transaction_type != "Compra":
+            raise HTTPException(
+                status_code=501,
+                detail="Right now, only purchases are supported.",
+            )
+
+        # Prepare the data for insertion
+        values = (
+            transaction.transaction_type,
+            transaction.amount,
+            transaction.merchant,
+            transaction.datetime.date(),
+            transaction.paynment_method,
+            transaction.email_log,
+        )
+
+        try:
+            cursor.execute(
+                get_query_to_insert_values(), values + values[:-1]
+            )
+            cursor.commit()
+
+            cursor.close()
+        except Exception:
+            raise HTTPException(status_code=500, detail="Insertion failed.")
+
+        return "Transaction added successfully."
     except Exception:
         raise HTTPException(status_code=500, detail="Connection failed.")
