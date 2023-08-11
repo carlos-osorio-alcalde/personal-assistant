@@ -24,6 +24,6 @@ AssistantBot assists with grammar correction. Send a message, and AssistantBot w
 AssistantBot offers an expense tracking feature. It utilizes a FastAPI-based API to integrate with my Gmail notifications from my bank, storing relevant data in an Azure SQL database. This data, combined with the language model, yields concise financial summaries.
 
 ## Infraestructure Overview
-AssistantBot is containerized with Docker and deployed as a long polling inside an Azure Virtual Machine. The CI/CD process is carried out by a workflows built in Github Actions.
+AssistantBot is containerized with Docker and deployed as a long polling service inside an Azure Virtual Machine. The CI/CD process is carried out by workflows built in Github Actions.
 
-The expenses API is a serverless service built with FastAPI and deployed on Azure Containers Apps. The information is stored inside an Azure SQL Server Database.
+The expenses API is a serverless service built with FastAPI and deployed on Azure Container Apps. The information is stored inside an Azure SQL Server Database.
