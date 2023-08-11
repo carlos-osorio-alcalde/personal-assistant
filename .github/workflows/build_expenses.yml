@@ -22,20 +22,19 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker buildx create --use
-          docker buildx build -t ${{ env.IMAGE_NAME }} --platform linux/amd64 -f expenses/Dockerfile .
+          docker build -t ${{ env.IMAGE_NAME }} --platform linux/amd64 -f expenses/Dockerfile .
 
       - name: Log in to Azure
         run: |
           az login 
 
-      - name: Log in to ACR
-        run: |
-          az acr login --name ${{ env.CONTAINER_REGISTRY }}
-
       - name: Tag Docker image
         run: |
           docker tag ${{ env.IMAGE_NAME }} ${{ env.CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+
+      - name: Log in to ACR
+        run: |
+          az acr login --name ${{ env.CONTAINER_REGISTRY }}
 
       - name: Push Docker image
         run: |
