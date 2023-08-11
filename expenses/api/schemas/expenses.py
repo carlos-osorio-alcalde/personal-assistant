@@ -1,4 +1,8 @@
+import datetime
+
 from pydantic import BaseModel
+
+from expenses.processors.schemas import TransactionInfo
 
 
 class BaseTransactionInfo(BaseModel):
@@ -23,3 +27,14 @@ class SummaryTransactionInfo(BaseModel):
     transfer_qr: BaseTransactionInfo
     payment: BaseTransactionInfo
     transfer: BaseTransactionInfo
+
+
+class AddTransactionInfo(TransactionInfo):
+    """
+    This class is used to add a transaction manually.
+    This inherits from TransactionInfo.
+    """
+
+    datetime = datetime.datetime.now()
+    paynment_method: str = "Cash"
+    email_log: str = ""

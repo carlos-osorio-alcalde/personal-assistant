@@ -1,7 +1,10 @@
 from fastapi import Depends, FastAPI
 
-from expenses.api.routers.database import router as connection_router
-from expenses.api.routers.expenses import router as expenses_router
+from expenses.api.routers import (
+    database_router,
+    expenses_router,
+    merchants_router,
+)
 from expenses.api.security import check_access_token
 
 # Define the FastAPI app
@@ -16,7 +19,8 @@ async def root():
 
 # Add the routers
 app.include_router(expenses_router, tags=["Expenses"])
-app.include_router(connection_router, tags=["Database"])
+app.include_router(database_router, tags=["Database"])
+app.include_router(merchants_router, tags=["Merchants"])
 
 if __name__ == "__main__":
     import uvicorn
