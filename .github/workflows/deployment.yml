@@ -9,6 +9,9 @@ on:
   push:
     paths:
       - 'assistantbot/**'
+  pull_request:
+    paths:
+      - 'assistantbot/**'
   workflow_dispatch:
 
 env:
