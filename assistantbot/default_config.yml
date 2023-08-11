@@ -19,3 +19,6 @@ WEATHER_LOCATIONS: "assistantbot/locations.json"
 
 # Drop pending updates
 DROP_PENDING_UPDATES: true
+
+# Poll interval in seconds
+POLL_INTERVAL: 15

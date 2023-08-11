@@ -1,18 +1,18 @@
 import time
 from assistantbot import bot
+from contextlib import contextmanager
+
+
+@contextmanager
+def handle_expections():
+    try:
+        yield
+    except (RuntimeWarning, Exception, RuntimeError) as e:
+        bot.logger.exception(e)
+        time.sleep(5)
 
 
 if __name__ == "__main__":
     while True:
-        try:
-            # Start the bot
+        with handle_expections():
             bot.main()
-        except Exception as e:
-            # Log the exception
-            bot.logger.exception(e)
-
-            # Sleep for 5 seconds
-            time.sleep(5)
-
-            # Restart the bot
-            continue

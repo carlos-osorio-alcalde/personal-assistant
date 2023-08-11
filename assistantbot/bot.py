@@ -61,5 +61,4 @@ def main() -> None:
         timeout=config["TIMEOUT"],
         allowed_updates=config["ALLOWED_UPDATES"],
         connect_timeout=config["TIMEOUT"],
-        drop_pending_updates=config["DROP_PENDING_UPDATES"],
     )

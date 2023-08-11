@@ -28,7 +28,8 @@ def get_configured_locations(raw: bool = True) -> Dict:
     """
     # Load the file locations.json into a dictionary
     path_location_json = Path(config["WEATHER_LOCATIONS"])
-    temperature_locations_ = json.load(open(path_location_json))
+    with open(path_location_json, "r") as f:
+        temperature_locations_ = json.load(f)
     temperature_locations = {
         location: values["name"]
         for location, values in temperature_locations_.items()

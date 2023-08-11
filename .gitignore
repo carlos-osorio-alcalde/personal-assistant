@@ -44,3 +44,7 @@ azure_test_function/
 
 # Ignore the folder expenses/api/database since it is used for testing
 expenses/api/database/
+
+# Ignore .cache files
+**/.cache
+
