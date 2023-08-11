@@ -45,8 +45,8 @@ def get_expenses(
                 f"count: {values_expenses['count']} \n"
             )
 
-    return expenses_str
+    return expenses_str if expenses_str else "No expenses found."
 
 
 if __name__ == "__main__":
-    print(get_expenses("daily"))
+    print(get_expenses("weekly"))
