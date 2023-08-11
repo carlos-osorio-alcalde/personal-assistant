@@ -43,9 +43,7 @@ def test_connection() -> str:
         raise HTTPException(status_code=500, detail="Connection failed.")
 
 
-@router.post(
-    "/populate_table/", dependencies=[Depends(check_access_token)]
-)
+@router.post("/populate_table/", dependencies=[Depends(check_access_token)])
 def populate_table(
     timeframe: Literal["daily", "weekly", "partial_weekly", "monthly"]
 ) -> str:
