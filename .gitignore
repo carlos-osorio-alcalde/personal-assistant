@@ -46,5 +46,9 @@ azure_test_function/
 expenses/api/database/
 
 # Ignore .cache files
+<<<<<<< HEAD
 **/.cache
 
+=======
+**/.cache
+>>>>>>> c372445 (Add the gitignore)
