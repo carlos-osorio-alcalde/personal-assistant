@@ -1,8 +1,8 @@
 from .expenses import (
     AddTransactionInfo,
     BaseTransactionInfo,
-    SummaryTransactionInfo,
     SummaryADayLikeToday,
+    SummaryTransactionInfo,
 )
 from .merchants import SummaryMerchant
 

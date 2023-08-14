@@ -35,6 +35,7 @@ class AddTransactionInfo(TransactionInfo):
     This inherits from TransactionInfo.
     """
 
+    transaction_type: str = "Compra"
     datetime = datetime.datetime.now()
     paynment_method: str = "Cash"
     email_log: str = ""

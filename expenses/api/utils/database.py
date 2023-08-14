@@ -1,8 +1,8 @@
 import datetime
 import os
-from typing import List, Union, Dict
-import numpy as np
+from typing import Dict, List, Union
 
+import numpy as np
 import pyodbc
 from dotenv import load_dotenv
 
