@@ -45,14 +45,17 @@ def test_connection() -> str:
 
 @router.post("/populate_table/", dependencies=[Depends(check_access_token)])
 def populate_table(
-    timeframe: Literal["daily", "weekly", "partial_weekly", "monthly"]
+    timeframe: Literal[
+        "daily", "weekly", "partial_weekly", "monthly", "from_origin"
+    ]
 ) -> str:
     """
     This function populates the transactions table.
 
     Parameters
     ----------
-    timeframe : Literal["daily", "weekly", "partial_weekly", "monthly"]
+    timeframe : Literal["daily", "weekly", "partial_weekly",
+                        "monthly", "from_origin"]
         The timeframe to obtain the expenses from.
 
     Returns
@@ -61,7 +64,13 @@ def populate_table(
         A message indicating the status of the connection.
     """
     # Check if the timeframe is valid
-    if timeframe not in ["daily", "weekly", "partial_weekly", "monthly"]:
+    if timeframe not in [
+        "daily",
+        "weekly",
+        "partial_weekly",
+        "monthly",
+        "from_origin",
+    ]:
         raise HTTPException(
             status_code=400,
             detail="The timeframe must be daily, weekly, partial_weekly or "
@@ -84,7 +93,7 @@ def populate_table(
                 transaction.transaction_type,
                 transaction.amount,
                 transaction.merchant,
-                transaction.datetime.date(),
+                transaction.datetime.replace(tzinfo=None),
                 transaction.paynment_method,
                 transaction.email_log,
             )
@@ -137,7 +146,7 @@ async def add_transaction(transaction: AddTransactionInfo) -> str:
             transaction.transaction_type,
             transaction.amount,
             transaction.merchant,
-            transaction.datetime.date(),
+            transaction.datetime.replace(tzinfo=None),
             transaction.paynment_method,
             transaction.email_log,
         )

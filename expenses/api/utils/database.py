@@ -1,6 +1,7 @@
 import datetime
 import os
-from typing import List, Union
+from typing import List, Union, Dict
+import numpy as np
 
 import pyodbc
 from dotenv import load_dotenv
@@ -181,3 +182,60 @@ def get_query_to_insert_values() -> str:
                 payment_method = ?
         )
         """
+
+
+def get_summary_a_day_like_today(weekday: int) -> Dict:
+    """
+    This function returns the summary of all the transactions of a day like
+    today.
+
+    Parameters
+    ----------
+    weekday : int
+        The weekday to search.
+
+    Returns
+    -------
+    dict
+        The summary of all the transactions of a day like today.
+    """
+    try:
+        cursor = get_cursor()
+        # Get the transactions
+        cursor.execute(
+            """
+                SET DATEFIRST 1;
+                SELECT CAST(datetime AS DATE),
+                        SUM(amount) AS amount_sum,
+                        COUNT(*) AS total_count
+                FROM transactions
+                WHERE transaction_type = 'Compra' AND
+                        DATEPART(weekday, datetime) = ?
+                GROUP BY CAST(datetime AS DATE)
+            """,
+            weekday,
+        )
+
+        # Get the summary
+        transactions = cursor.fetchall()
+
+        # Close the connection
+        cursor.close()
+    except Exception:
+        return {}
+
+    # Get the summary with the correct type
+    if len(transactions) > 0:
+        # Compute the values
+        summary = {
+            "mean_number_of_purchases": np.mean(
+                [transaction[2] for transaction in transactions]
+            ),
+            "median_amount_of_purchases": np.median(
+                [transaction[1] for transaction in transactions]
+            ),
+        }
+    else:
+        summary = {}
+
+    return summary
