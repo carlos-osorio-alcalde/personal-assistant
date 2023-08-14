@@ -22,6 +22,8 @@ class GetExpensesCommand(BaseCommand):
         self._timeframe: Literal[
             "daily", "weekly", "partial_weekly", "monthly"
         ] = None
+        self._median_amount_purchases = 0
+        self._mean_num_purchases = 0
 
     async def command_callback(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
@@ -59,7 +61,10 @@ class GetExpensesCommand(BaseCommand):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=get_expenses_response(
-                **{"timeframe": self._timeframe, "expenses": expenses_str}
+                timeframe=self._timeframe,
+                expenses=expenses_str,
+                median_amount_purchases=self._median_amount_purchases,
+                mean_num_purchases=self._mean_num_purchases,
             ),
         )
 
