@@ -8,7 +8,6 @@ assistant/
 **/__pycache__/
 
 # Ignore the .vscode folder
-.vscode/
 
 # Ignore .pem files
 **/*.pem
@@ -31,5 +30,21 @@ conversation/voice/temp/*.wav
 # Ignore the .DS_Store files
 **/.DS_Store
 
+# Ignore the test script
+expenses/test.py
+
+# Ignore the .env files
+**/.env
+**/.docker.env
+**/.accesapi.env
+**/.expenses.env
+
+# Ignore the azure_test_function path
+azure_test_function/
+
+# Ignore the folder expenses/api/database since it is used for testing
+expenses/api/database/
+
 # Ignore .cache files
 **/.cache
+

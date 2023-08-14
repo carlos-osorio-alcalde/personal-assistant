@@ -1,5 +1,6 @@
 python-telegram-bot == 20.3
 fastapi == 0.99.1
+uvicorn == 0.23.2
 python-dotenv == 0.21.1
 PyYAML == 6.0
 openai == 0.27.8
@@ -9,3 +10,8 @@ Random-Word == 1.0.11
 azure-cognitiveservices-speech == 1.30.0
 soundfile == 0.12.0
 spotipy == 2.23.0
+secure-smtplib == 0.1.1
+beautifulsoup4 == 4.12.2
+python-jose == 3.3.0
+azure-functions == 1.15.0
+pyodbc == 4.0.39
