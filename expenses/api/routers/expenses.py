@@ -57,7 +57,7 @@ async def get_expenses(
 
 
 @router.get(
-    "/a_day_like_today/{timeframe}",
+    "/a_day_like_today/",
     response_model=SummaryADayLikeToday,
     dependencies=[Depends(check_access_token)],
 )
