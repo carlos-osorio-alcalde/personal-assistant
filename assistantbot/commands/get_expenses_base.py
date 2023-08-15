@@ -1,6 +1,7 @@
+from typing import Literal
+
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes
-from typing import Literal
 
 from assistantbot.ai.text.base_response import BaseResponse
 from assistantbot.ai.text.prompts.expenses import (
