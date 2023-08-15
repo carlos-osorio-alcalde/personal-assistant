@@ -1,6 +1,7 @@
 import os
-from typing import Literal
+from typing import Literal, Tuple
 
+import pyodbc
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
@@ -19,6 +20,30 @@ router = APIRouter(prefix="/database")
 # Check if the file exists
 if os.path.exists("expenses/.env"):
     load_dotenv(dotenv_path="expenses/.env")
+
+# Function to insert the data into the database
+def insert_data_into_database(
+    cursor: pyodbc.Cursor, transaction: Tuple
+) -> str:
+    """
+    This function inserts the data into the database.
+
+    Parameters
+    ----------
+    cursor : pyodbc.Cursor
+        The cursor to the database.
+    transaction : Tuple
+        The transaction to insert.
+    """
+    try:
+        cursor.execute(
+            get_query_to_insert_values(), transaction + transaction[:-1]
+        )
+        cursor.commit()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Insertion failed.")
+
+    return "Operation completed successfully."
 
 
 @router.get("/test_connection", dependencies=[Depends(check_access_token)])
@@ -45,14 +70,17 @@ def test_connection() -> str:
 
 @router.post("/populate_table/", dependencies=[Depends(check_access_token)])
 def populate_table(
-    timeframe: Literal["daily", "weekly", "partial_weekly", "monthly"]
+    timeframe: Literal[
+        "daily", "weekly", "partial_weekly", "monthly", "from_origin"
+    ]
 ) -> str:
     """
     This function populates the transactions table.
 
     Parameters
     ----------
-    timeframe : Literal["daily", "weekly", "partial_weekly", "monthly"]
+    timeframe : Literal["daily", "weekly", "partial_weekly",
+                        "monthly", "from_origin"]
         The timeframe to obtain the expenses from.
 
     Returns
@@ -61,7 +89,13 @@ def populate_table(
         A message indicating the status of the connection.
     """
     # Check if the timeframe is valid
-    if timeframe not in ["daily", "weekly", "partial_weekly", "monthly"]:
+    if timeframe not in [
+        "daily",
+        "weekly",
+        "partial_weekly",
+        "monthly",
+        "from_origin",
+    ]:
         raise HTTPException(
             status_code=400,
             detail="The timeframe must be daily, weekly, partial_weekly or "
@@ -78,31 +112,22 @@ def populate_table(
         # Establish the connection
         cursor = get_cursor()
 
-        # Prepare the data for insertion
-        insert_values = [
-            (
-                transaction.transaction_type,
-                transaction.amount,
-                transaction.merchant,
-                transaction.datetime.date(),
-                transaction.paynment_method,
-                transaction.email_log,
+        for transaction in transactions:
+            insert_data_into_database(
+                cursor,
+                (
+                    transaction.transaction_type,
+                    transaction.amount,
+                    transaction.merchant,
+                    transaction.datetime.replace(tzinfo=None),
+                    transaction.paynment_method,
+                    transaction.email_log,
+                ),
             )
-            for transaction in transactions
-        ]
 
-        try:
-            for values in insert_values:
-                cursor.execute(
-                    get_query_to_insert_values(), values + values[:-1]
-                )
-                cursor.commit()
-
-            cursor.close()
-        except Exception:
-            raise HTTPException(status_code=500, detail="Insertion failed.")
-
-        return "Table populated successfully."
+        # Close the connection
+        cursor.close()
+        return "Operation completed successfully."
     except Exception:
         raise HTTPException(status_code=500, detail="Connection failed.")
 
@@ -132,26 +157,20 @@ async def add_transaction(transaction: AddTransactionInfo) -> str:
                 detail="Right now, only purchases are supported.",
             )
 
-        # Prepare the data for insertion
-        values = (
-            transaction.transaction_type,
-            transaction.amount,
-            transaction.merchant,
-            transaction.datetime.date(),
-            transaction.paynment_method,
-            transaction.email_log,
+        # Insert the data into the database
+        insert_data_into_database(
+            cursor,
+            (
+                transaction.transaction_type,
+                transaction.amount,
+                transaction.merchant,
+                transaction.datetime.replace(tzinfo=None),
+                transaction.paynment_method,
+                transaction.email_log,
+            ),
         )
-
-        try:
-            cursor.execute(
-                get_query_to_insert_values(), values + values[:-1]
-            )
-            cursor.commit()
-
-            cursor.close()
-        except Exception:
-            raise HTTPException(status_code=500, detail="Insertion failed.")
-
-        return "Transaction added successfully."
+        # Close the connection
+        cursor.close()
+        return "Operation completed successfully."
     except Exception:
         raise HTTPException(status_code=500, detail="Connection failed.")

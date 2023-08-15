@@ -133,6 +133,15 @@ class EmailProcessor(ABC):
             else:
                 value_str = value_str.split(",")[0]
 
+        # For the values that only have a comma or a dot, check if the
+        # number of values that are at the right of the comma are 2.
+        # If that is the case, assume that the value is in dollars.
+        # Otherwise, assume that the value is in COP.
+        if "," in value_str:
+            if len(value_str.split(",")[1]) == 2:
+                value_str = value_str.replace(",", ".")
+                return float(value_str) * 4000
+
         value_str = value_str.replace(",", "").replace(".", "")
         return float(value_str)
 
