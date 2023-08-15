@@ -7,6 +7,7 @@ from typing import Optional, Literal
 from langchain.chains import ConversationChain
 from assistantbot.conversation.base import ConversationHandler
 from assistantbot.conversation.text.handlers import TextHandler
+from assistantbot.ai.voice.sintetizer import VoiceSintetizer
 from assistantbot.ai.voice.whisper import transcript_audio
 from assistantbot.ai.voice.pronunciation import PronunciationAssessment
 from assistantbot.ai.text.prompts.pronunciation import (
@@ -63,7 +64,10 @@ class VoiceHandler(ConversationHandler):
 
         # Send the typing action
         await context.bot.send_chat_action(
-            chat_id=update.effective_chat.id, action="typing"
+            chat_id=update.effective_chat.id,
+            action="record_voice",
+            read_timeout=20,
+            write_timeout=20,
         )
 
         # Get the voice message
@@ -87,7 +91,7 @@ class VoiceHandler(ConversationHandler):
         entry_message = self._transcript_voice_message(f"{output_file}.wav")
         response_message = self._create_text_response(entry_message)
 
-        # Get the final response concatenating the response_message with the
+        # Get the final response with the voice message and the
         # pronunciation assessment
 
         # Get the pronunciation assessment
@@ -95,15 +99,30 @@ class VoiceHandler(ConversationHandler):
             entry_message, f"{output_file}.wav"
         )
 
-        # Send the response message
+        # Send the response message via voice
+        voice_sintetizer = VoiceSintetizer(
+            file_to_save=f"{output_file}_response.wav"
+        )
+        voice_sintetizer.sintetize_text(response_message)
+
+        # Send the voice message
+        await context.bot.send_audio(
+            chat_id=update.effective_chat.id,
+            audio=open(f"{output_file}_response.wav", "rb"),
+            title="This is my response",
+            caption=response_message[0:1024],
+        )
+
+        # Send the assessment message
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=response_message + "\n\n" + assessment_message,
+            text=assessment_message,
             parse_mode="HTML",
         )
 
         # Delete the .wav files
         Path(f"{output_file}.wav").unlink()
+        Path(f"{output_file}_response.wav").unlink()
 
     @staticmethod
     def _process_incoming_audio(input_file: str, output_file: str) -> None:
