@@ -21,7 +21,12 @@ def get_implemented_command_handlers() -> List[BaseCommand]:
     """
     # Excluded commands. The temperature command is excluded because it is
     # implemented in a different way using the command factory pattern.
-    excluded_commands = ["__init__", "base", "temperature"]
+    excluded_commands = [
+        "__init__",
+        "base",
+        "temperature",
+        "get_expenses_base",
+    ]
 
     # The implemented command is the intersection of the commands in the
     # commands directory and the commands configured in the bot
