@@ -1,7 +1,14 @@
+import json
+import os
+from typing import Literal
+
 import requests
 from dotenv import load_dotenv
 import os
 from typing import Literal, Tuple
+
+import requests
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()

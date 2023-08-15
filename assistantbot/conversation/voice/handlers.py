@@ -1,20 +1,21 @@
+from pathlib import Path
+from typing import Literal, Optional
+
+import soundfile as sf
+from langchain.chains import ConversationChain
 from telegram import Update
 from telegram.ext import CallbackContext, MessageHandler, filters
-from pathlib import Path
-import soundfile as sf
-from typing import Optional, Literal
 
-from langchain.chains import ConversationChain
-from assistantbot.conversation.base import ConversationHandler
-from assistantbot.conversation.text.handlers import TextHandler
-from assistantbot.ai.voice.sintetizer import VoiceSintetizer
-from assistantbot.ai.voice.whisper import transcript_audio
-from assistantbot.ai.voice.pronunciation import PronunciationAssessment
 from assistantbot.ai.text.prompts.pronunciation import (
     GLOBAL_PRONUNCIATION_ASSESSMENT,
-    WORDS_PRONUNCIATION_ASSESSMENT_BASE,
     WORD_PRONUNCIATION_ASSESSMENT_PARTICULAR,
+    WORDS_PRONUNCIATION_ASSESSMENT_BASE,
 )
+from assistantbot.ai.voice.pronunciation import PronunciationAssessment
+from assistantbot.ai.voice.sintetizer import VoiceSintetizer
+from assistantbot.ai.voice.whisper import transcript_audio
+from assistantbot.conversation.base import ConversationHandler
+from assistantbot.conversation.text.handlers import TextHandler
 
 
 class VoiceHandler(ConversationHandler):

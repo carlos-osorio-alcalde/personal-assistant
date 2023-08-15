@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 
 from dotenv import load_dotenv
+
 from assistantbot.commands.base import BaseCommand
 
 # Load environment variables

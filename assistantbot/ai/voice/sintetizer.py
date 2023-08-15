@@ -1,7 +1,7 @@
-import azure.cognitiveservices.speech as speechsdk
-
-from dotenv import load_dotenv
 import os
+
+import azure.cognitiveservices.speech as speechsdk
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -70,5 +70,3 @@ class VoiceSintetizer:
         # Synthesizes the received text to speech.
         result = self.speech_synthesizer.speak_text_async(text).get()
         return result if text is not None else None
-
-
