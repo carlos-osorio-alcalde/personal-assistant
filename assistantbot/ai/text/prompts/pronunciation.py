@@ -1,5 +1,4 @@
 GLOBAL_PRONUNCIATION_ASSESSMENT = """
--------------------------------------------------------------
 The phrase I heard was:
 
 {phrase}
