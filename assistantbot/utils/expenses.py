@@ -1,8 +1,9 @@
+import json
+import os
+from typing import Literal
+
 import requests
 from dotenv import load_dotenv
-import os
-import json
-from typing import Literal
 
 # Load environment variables
 load_dotenv()

@@ -1,8 +1,10 @@
-from .dataclasses import GlobalAssesmentResult, WordAssesmentResult
-import azure.cognitiveservices.speech as speechsdk
-from typing import Literal, Optional, List
-from dotenv import load_dotenv
 import os
+from typing import List, Literal, Optional
+
+import azure.cognitiveservices.speech as speechsdk
+from dotenv import load_dotenv
+
+from .dataclasses import GlobalAssesmentResult, WordAssesmentResult
 
 load_dotenv()
 

@@ -1,6 +1,7 @@
-import openai
-from pathlib import Path
 import os
+from pathlib import Path
+
+import openai
 
 
 def transcript_audio(audio_file: str) -> str:
