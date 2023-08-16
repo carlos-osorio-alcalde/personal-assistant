@@ -11,20 +11,44 @@ AssistantBot is a Telegram bot designed to provide practical and engaging featur
 ### Conversational Interaction
 By default, AssistantBot leverages Langchain and OpenAI's ChatGPT 3.5 APIs to facilitate engaging text-based conversations. It can answer a variety of user questions and provide responses with a personalized touch.
 
+<p align="center">
+  <img src="img/conversation.png" width="300"  title="Simple conversation">
+</p>
+
 ### Voice note communication
 It is possible to interact with AssistantBot using voice notes. When AssistanBot receives a new voice note, it will process the content and provide contextually relevant responses. Additionally, it assesses pronunciation quality using Microsoft Azure's cognitive services and OpenAI's Whisper, offering self-assessment for language learners.
+
+<p align="center">
+  <img src="img/voice_response.png" width="300"  title="Voice notes">
+</p>
 
 ### Weather Updates
 AssistantBot integrates with the OpenWeather API to provide weather updates in a conversational manner. Inquiries about temperature in different locations yield informative responses with a touch of personality.
 
+<p align="center">
+  <img src="img/temperature.png" width="300"  title="Weather">
+</p>
+
 ### Vocabulary expansion
 Use AssistantBot's random word command to receive English words along with explanations. This feature aids in improving vocabulary and language skills through exposure to diverse linguistic content.
+
+<p align="center">
+  <img src="img/random_word.png" width="300"  title="Target variable">
+</p>
 
 ### Grammar correction
 AssistantBot assists with grammar correction. Send a message, and AssistantBot will identify and rectify grammatical errors using its language capabilities.
 
+<p align="center">
+  <img src="img/grammar.png" width="300"  title="Grammar">
+</p>
+
 ### Track my expenses
 AssistantBot offers an expense tracking feature. It utilizes a FastAPI-based API to integrate with my Gmail notifications from my bank, storing relevant data in an Azure SQL database. This data, combined with the language model, yields concise financial summaries.
+
+<p align="center">
+  <img src="img/expenses.png" width="300"  title="Expenses">
+</p>
 
 ## Infraestructure Overview
 AssistantBot is containerized with Docker and deployed as a long polling service inside an Azure Virtual Machine. The CI/CD process is carried out by workflows built in Github Actions.
@@ -32,5 +56,5 @@ AssistantBot is containerized with Docker and deployed as a long polling service
 The expenses API is a serverless service built with FastAPI and deployed on Azure Container Apps. The information is stored inside an Azure SQL Server Database.
 
 <p align="center">
-  <img src="img/diagram.jpg" width="1200"  title="Target variable">
+  <img src="img/diagram.jpg" width="1200"  title="Infraestructure">
 </p>
