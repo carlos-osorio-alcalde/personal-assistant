@@ -21,6 +21,7 @@ router = APIRouter(prefix="/database")
 if os.path.exists("expenses/.env"):
     load_dotenv(dotenv_path="expenses/.env")
 
+
 # Function to insert the data into the database
 def insert_data_into_database(
     cursor: pyodbc.Cursor, transaction: Tuple
