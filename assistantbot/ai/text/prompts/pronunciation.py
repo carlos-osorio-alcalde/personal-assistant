@@ -11,11 +11,10 @@ And here's the result of your pronunciation assessment:
 
 WORDS_PRONUNCIATION_ASSESSMENT_BASE = """
 
-Well, there's room for improvement in some words.
 Here's the list of the words that you could pronnunciate better the
 next time:
 """
 
 WORD_PRONUNCIATION_ASSESSMENT_PARTICULAR = """
-- {word}, <b> accuracy score: {accuracy_score} </b>
+- {word}, <b> {syllabes_string} </b>
 """

@@ -1,17 +1,17 @@
+import json
 import os
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Tuple
 
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 
-from .dataclasses import GlobalAssesmentResult, WordAssesmentResult
+from assistantbot.ai.voice.dataclasses import (
+    GlobalAssesmentResult,
+    SyllabeAssesmentResult,
+    WordAssesmentResult,
+)
 
 load_dotenv()
-
-# Get the speech key and service region from the environment variables
-speech_key, service_region = os.getenv(
-    "AZURE_SPEECH_SUBSCRIPTION_KEY"
-), os.getenv("SPEECH_REGION")
 
 
 class PronunciationAssessment:
@@ -20,7 +20,9 @@ class PronunciationAssessment:
         grading_system: Optional[
             Literal["hundred_mark", "five_points"]
         ] = "hundred_mark",
-        granularity: Optional[Literal["phoneme", "word", "full"]] = "word",
+        granularity: Optional[
+            Literal["phoneme", "word", "full"]
+        ] = "phoneme",
     ):
         """
         This class performs the pronunciation assessment of a given audio
@@ -31,7 +33,7 @@ class PronunciationAssessment:
         grading_system : Optional[ Literal['hundred_mark', 'five_points']]
             The grading system to use, by default "hundred_mark"
         granularity : Optional[Literal['phoneme';, 'word';, 'full']]
-            The granularity of the assesment, by default "word"
+            The granularity of the assesment, by default "phoneme"
         """
         self.assessment = None
 
@@ -53,7 +55,7 @@ class PronunciationAssessment:
 
     def get_assessment(
         self, reference_text: str, input_audio_path: str
-    ) -> speechsdk.PronunciationAssessmentResult:
+    ) -> Tuple[dict, speechsdk.PronunciationAssessmentResult,]:
         """
         This function performs the pronunciation assessment of a given audio
         file and returns the assessment.
@@ -65,10 +67,18 @@ class PronunciationAssessment:
 
         input_audio_path : str
             The path to the audio file.
+
+        Returns
+        -------
+        Tuple[dict, speechsdk.PronunciationAssessmentResult] # noqa
+            The json of the recognition result (including the assessment
+            result for every syllabe) and the pronunciation assessment
+            result.
         """
         # Create the speech config
         speech_config = speechsdk.SpeechConfig(
-            subscription=speech_key, region=service_region
+            subscription=os.getenv("AZURE_SPEECH_SUBSCRIPTION_KEY"),
+            region=os.getenv("SPEECH_REGION"),
         )
         audio_config = speechsdk.audio.AudioConfig(filename=input_audio_path)
 
@@ -92,12 +102,20 @@ class PronunciationAssessment:
         # apply pronunciation assessment config to speech recognizer
         pronunciation_assessment_config.apply_to(speech_recognizer)
 
-        assessment_result = speech_recognizer.recognize_once()
+        # Get the recognition
+        recognition_result = speech_recognizer.recognize_once_async().get()
+
+        # Get the recognition result as a json
+        json_recognition_result = json.loads(recognition_result.json)
+
         if (
-            assessment_result.reason
+            recognition_result.reason
             == speechsdk.ResultReason.RecognizedSpeech
         ):
-            return speechsdk.PronunciationAssessmentResult(assessment_result)
+            return (
+                json_recognition_result,
+                speechsdk.PronunciationAssessmentResult(recognition_result),
+            )
         else:
             raise Exception("The assessment was not performed correctly.")
 
@@ -125,7 +143,7 @@ class PronunciationAssessment:
 
     @staticmethod
     def get_words_scores(
-        pronunciation_result: speechsdk.PronunciationAssessmentResult,
+        json_recognition_result: dict,
     ) -> List[WordAssesmentResult]:
         """
         This function returns the word assessment of the assessment.
@@ -140,10 +158,23 @@ class PronunciationAssessment:
         List[WordAssesmentResult]
             The list of word assessment results.
         """
-        words_results = [
+        # Obtain the words
+        words = json_recognition_result["NBest"][0]["Words"]
+        return [
             WordAssesmentResult(
-                word=word.word, accuracy_score=word.accuracy_score
+                word=word["Word"],
+                syllabes=[
+                    SyllabeAssesmentResult(
+                        syllabe=syllable["Syllable"],
+                        accuracy_score=syllable["PronunciationAssessment"][
+                            "AccuracyScore"
+                        ],
+                    )
+                    for syllable in word["Syllables"]
+                ],
+                accuracy_score=word["PronunciationAssessment"][
+                    "AccuracyScore"
+                ],
             )
-            for word in pronunciation_result.words
+            for word in words
         ]
-        return words_results
