@@ -121,6 +121,7 @@ def populate_table(
             transactions = get_transactions(
                 email_from=email, date_to_search=date_to_search
             )
+            print(email, transactions)
 
             for transaction in transactions:
                 insert_data_into_database(
@@ -138,7 +139,8 @@ def populate_table(
         # Close the connection
         cursor.close()
         return "Operation completed successfully."
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail="Connection failed.")
 
 

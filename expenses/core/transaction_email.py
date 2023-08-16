@@ -74,9 +74,15 @@ class TransactionEmail:
         datetime_email = self.body_email["Date"]
 
         # Convert to datetime object
-        datetime_email = datetime.strptime(
-            datetime_email, "%a, %d %b %Y %H:%M:%S %z (%Z)"
-        )
+        try:
+            datetime_email = datetime.strptime(
+                datetime_email, "%a, %d %b %Y %H:%M:%S %z (%Z)"
+            )
+        except ValueError:
+            datetime_email = datetime.strptime(
+                datetime_email.replace(" (EDT)", ""),
+                "%a, %d %b %Y %H:%M:%S %z",
+            )
 
         # The date is given in the UTC. We need UTC-5
         self._date = datetime_email.astimezone(
