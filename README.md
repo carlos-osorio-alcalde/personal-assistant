@@ -1,4 +1,7 @@
 # AssistantBot: My Personal Assistant Telegram Bot 🤖
+<p align="center">
+  <img src="img/assistantbot.png" width="400"  title="Target variable">
+</p>
 AssistantBot is a Telegram bot designed to provide practical and engaging features, making interactions efficient and informative. It serves as a personal assistant, offering a range of capabilities tailored to enhance productivity and communication.
 
 <b> Disclaimer Note: </b> AssistantBot is currently utilized exclusively as a personal assistant and is intended for private use only.
@@ -27,3 +30,7 @@ AssistantBot offers an expense tracking feature. It utilizes a FastAPI-based API
 AssistantBot is containerized with Docker and deployed as a long polling service inside an Azure Virtual Machine. The CI/CD process is carried out by workflows built in Github Actions.
 
 The expenses API is a serverless service built with FastAPI and deployed on Azure Container Apps. The information is stored inside an Azure SQL Server Database.
+
+<p align="center">
+  <img src="img/diagram.jpg" width="800"  title="Target variable">
+</p>
