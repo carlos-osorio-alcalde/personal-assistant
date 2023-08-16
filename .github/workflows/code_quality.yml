@@ -22,7 +22,7 @@ jobs:
           python-version: 3.9
 
       - name: Install dependencies
-        run: pip install black flake8
+        run: pip install black==22.6.0 flake8
 
       - name: Run black
         run: black -l 77 --check .
