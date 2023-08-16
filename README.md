@@ -1,8 +1,8 @@
 <p align="center">
   <img src="img/AssistantBot_1.png" width="1200"  title="Target variable">
 </p>
-<b> Disclaimer Note⚠️: </b> AssistantBot is currently used exclusively as a personal assistant and is intended for private use only.
 
+<b> Disclaimer Note⚠️: </b> AssistantBot is currently used exclusively as a personal assistant and is intended for private use only.
 
 AssistantBot is a Telegram bot designed to provide practical and engaging features, making interactions efficient and informative. It serves as a personal assistant, offering a range of capabilities tailored to enhance productivity and communication.
 
