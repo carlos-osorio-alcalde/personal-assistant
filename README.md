@@ -32,5 +32,5 @@ AssistantBot is containerized with Docker and deployed as a long polling service
 The expenses API is a serverless service built with FastAPI and deployed on Azure Container Apps. The information is stored inside an Azure SQL Server Database.
 
 <p align="center">
-  <img src="img/diagram.jpg" width="800"  title="Target variable">
+  <img src="img/diagram.jpg" width="1200"  title="Target variable">
 </p>
