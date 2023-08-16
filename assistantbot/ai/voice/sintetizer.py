@@ -5,15 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Get the speech key and service region from the environment variables
-speech_key, service_region = os.getenv(
-    "AZURE_SPEECH_SUBSCRIPTION_KEY"
-), os.getenv("SPEECH_REGION")
-
 
 class VoiceSintetizer:
     def __init__(
-        self, voice: str = "en-US-AshleyNeural", file_to_save: str = None
+        self, voice: str = "en-US-SaraNeural", file_to_save: str = None
     ):
         self._voice = voice
         self._output_file = file_to_save
@@ -35,7 +30,8 @@ class VoiceSintetizer:
             The speech sintetized object.
         """
         speech_config = speechsdk.SpeechConfig(
-            subscription=speech_key, region=service_region
+            subscription=os.getenv("AZURE_SPEECH_SUBSCRIPTION_KEY"),
+            region=os.getenv("SPEECH_REGION"),
         )
 
         file_config = speechsdk.audio.AudioOutputConfig(

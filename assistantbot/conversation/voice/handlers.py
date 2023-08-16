@@ -25,7 +25,9 @@ class VoiceHandler(ConversationHandler):
         grading_system: Optional[
             Literal["hundred_mark", "five_points"]
         ] = "hundred_mark",
-        granularity: Optional[Literal["phoneme", "word", "full"]] = "word",
+        granularity: Optional[
+            Literal["phoneme", "word", "full"]
+        ] = "phoneme",
     ):
         """
         This class handles the voice messages sent to the bot.
@@ -208,7 +210,10 @@ class VoiceHandler(ConversationHandler):
         str
             The string with the assessment of the pronunciation.
         """
-        assessment_result = self.pronuntiation_assessment.get_assessment(
+        (
+            json_recognition_result,
+            assessment_result,
+        ) = self.pronuntiation_assessment.get_assessment(
             reference_text, input_audio_path
         )
 
@@ -219,7 +224,7 @@ class VoiceHandler(ConversationHandler):
 
         # Get the word assessment result
         word_assessment = self.pronuntiation_assessment.get_words_scores(
-            assessment_result
+            json_recognition_result
         )
 
         # Create the assessment string for word assessment
@@ -227,13 +232,18 @@ class VoiceHandler(ConversationHandler):
         tagged_text = ""
 
         for word in word_assessment:
-            if word.accuracy_score <= 90:
-                # If there is a word with a bad pronunciation, add it to the
-                # assessment string
+            # If there is a word with a bad pronunciation, add it to the
+            # assessment string
+            if word.accuracy_score <= 95:
+                # Get the string of the syllabes
+                syllabes_string = "".join(
+                    f"{s.syllabe} ({s.accuracy_score}) "
+                    for s in word.syllabes
+                )
+
                 assessment_words_string += (
                     WORD_PRONUNCIATION_ASSESSMENT_PARTICULAR.format(
-                        word=word.word,
-                        accuracy_score=word.accuracy_score,
+                        word=word.word, syllabes_string=syllabes_string
                     )
                 )
 

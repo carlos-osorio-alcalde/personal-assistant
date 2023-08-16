@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
@@ -14,10 +15,21 @@ class GlobalAssesmentResult:
 
 
 @dataclass
+class SyllabeAssesmentResult:
+    """
+    This class represents the word assesment result of a given audio file.
+    """
+
+    syllabe: str
+    accuracy_score: float
+
+
+@dataclass
 class WordAssesmentResult:
     """
     This class represents the word assesment result of a given audio file.
     """
 
     word: str
+    syllabes: List[SyllabeAssesmentResult]
     accuracy_score: float
