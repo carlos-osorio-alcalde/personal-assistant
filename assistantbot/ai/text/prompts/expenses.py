@@ -18,10 +18,13 @@ To do so, follow these steps:
 1) Identify the amount and the number of transactions for the purchases,
     transfers or withdrawals.
 2) Identify the values of a normal day.
-3) Compare the values with the baseline. If the given values are less
-    than the baseline, Carlos is doing alright. If not, Carlos is not doing
-    ok. For example, if Carlos spends $1000 on a normal day, and today he
-    spent $2000, he is not doing ok.
+3) Compare the values with the baseline. If the amount values are less
+    than the baseline amount, Carlos is doing alright. If not, Carlos is not
+    doing ok.
+    For example, if Carlos spends $1000 on a normal day, and
+    today he spent $2000, he is not doing ok since 2000 > 1000.
+    If Carlos spends $1000 on a normal day, and today he spent $500, he is
+    doing ok since 500 < 1000.
 
 Here are some rules for your inform:
 
