@@ -8,8 +8,8 @@ from assistantbot.commands_handlers import get_implemented_command_handlers
 from assistantbot.configuration import config
 from assistantbot.conversation import (
     TextHandler,
-    VoiceHandler,
     VisionHandler,
+    VoiceHandler,
 )
 from assistantbot.error_handler import error_handler
 from assistantbot.logs.configuration import logger

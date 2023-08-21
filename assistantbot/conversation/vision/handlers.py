@@ -4,13 +4,11 @@ from langchain.chains import ConversationChain
 from telegram import Update
 from telegram.ext import CallbackContext, MessageHandler, filters
 
-from assistantbot.ai.text.base_response import BaseResponse
 from assistantbot.ai.text.prompts.image_captioning import (
     IMAGE_CAPTION_PROMPT,
-    USER_PROMPT_TEMPLATE_CAPTIONING,
-    AUTOMATIC_IMAGE_CAPTION,
 )
 from assistantbot.ai.vision.captioner import VisionCaptioner
+from assistantbot.conversation import TextHandler
 from assistantbot.conversation.base import ConversationHandler
 
 
@@ -42,6 +40,36 @@ class VisionHandler(ConversationHandler):
         """
         return MessageHandler(self._type, self.callback)
 
+    def _create_response(self, image_caption: str) -> str:
+        """
+        This method is used to create the response for the
+        message handler.
+
+        Parameters
+        ----------
+        image_caption : str
+            The caption for the image.
+
+        Returns
+        -------
+        str
+            The response for the message handler.
+        """
+        # If the conversation chain is not specified, use the default one
+        # However, this should not happen
+        if self.conversation_chain is None:
+            self.conversation_chain = TextHandler().conversation_chain
+
+        # Create the entry for the caption in the context of the conversation
+        entry_message = IMAGE_CAPTION_PROMPT.format(caption=image_caption)
+
+        # Add the caption to the context of the conversation
+        response_message = self.conversation_chain.predict(
+            input=entry_message
+        )
+
+        return response_message
+
     async def callback(
         self, update: Update, context: CallbackContext
     ) -> None:
@@ -67,14 +95,7 @@ class VisionHandler(ConversationHandler):
         caption = self.vision_captioner.get_caption(image.file_path)
 
         # Get the message using the caption
-        image_response = BaseResponse(
-            IMAGE_CAPTION_PROMPT, USER_PROMPT_TEMPLATE_CAPTIONING
-        ).create_response
-
-        # Get the message to send to the user
-        response = image_response(caption=caption)
+        image_response = self._create_response(image_caption=caption)
 
         # Send the caption to the user
-        await update.message.reply_text(
-            response + AUTOMATIC_IMAGE_CAPTION.format(caption=caption)
-        )
+        await update.message.reply_text(image_response)
