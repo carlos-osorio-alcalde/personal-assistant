@@ -59,9 +59,23 @@ class TextHandler(ConversationHandler):
         )
 
         # Predict the response
-        response_message = self.conversation_chain.predict(
-            input=entry_message
-        )
+        try:
+            response_message = self.conversation_chain.predict(
+                input=entry_message
+            )
+        except Exception:
+            # Clear the memory if the conversation is too long
+            self.conversation_chain.memory.clear()
+
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Well, we've had a very long conversation. \
+                    I will forget everything we've talked about to \
+                    be able to continue our conversation.",
+            )
+            response_message = self.conversation_chain.predict(
+                input=entry_message
+            )
 
         # Send the start message to the user
         await context.bot.send_message(
