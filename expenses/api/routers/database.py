@@ -15,6 +15,12 @@ from expenses.api.utils import (
     get_transactions,
 )
 
+# Emails to obtain the transactions from
+EMAILS_FROM_ = [
+    "alertasynotificaciones@notificacionesbancolombia.com",
+    "alertasynotificaciones@bancolombia.com.co",
+]
+
 router = APIRouter(prefix="/database")
 
 # Check if the file exists
@@ -107,24 +113,28 @@ def populate_table(
         # Get the date to search
         date_to_search = get_date_from_search(timeframe)
 
-        # Process the transactions
-        transactions = get_transactions(date_to_search)
-
         # Establish the connection
         cursor = get_cursor()
 
-        for transaction in transactions:
-            insert_data_into_database(
-                cursor,
-                (
-                    transaction.transaction_type,
-                    transaction.amount,
-                    transaction.merchant,
-                    transaction.datetime.replace(tzinfo=None),
-                    transaction.paynment_method,
-                    transaction.email_log,
-                ),
+        for email in EMAILS_FROM_:
+            # Process the transactions
+            transactions = get_transactions(
+                email_from=email, date_to_search=date_to_search
             )
+            print(email, transactions)
+
+            for transaction in transactions:
+                insert_data_into_database(
+                    cursor,
+                    (
+                        transaction.transaction_type,
+                        transaction.amount,
+                        transaction.merchant,
+                        transaction.datetime.replace(tzinfo=None),
+                        transaction.paynment_method,
+                        transaction.email_log,
+                    ),
+                )
 
         # Close the connection
         cursor.close()

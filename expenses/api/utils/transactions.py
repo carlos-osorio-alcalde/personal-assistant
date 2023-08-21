@@ -12,10 +12,9 @@ from expenses.core.transaction_email import TransactionEmail
 from expenses.processors.factory import EmailProcessorFactory
 from expenses.processors.schemas import TransactionInfo
 
-EMAIL_FROM = "alertasynotificaciones@notificacionesbancolombia.com"
-
 
 def get_transactions(
+    email_from: str,
     date_to_search: datetime.datetime,
 ) -> List[TransactionInfo]:
     """
@@ -24,6 +23,9 @@ def get_transactions(
 
     Parameters
     ----------
+    email_from : str
+        The email address to obtain the transactions from.
+
     date_to_search : datetime.datetime
         The date to obtain the transactions from.
 
@@ -34,11 +36,13 @@ def get_transactions(
     """
     gmail_client = GmailClient(os.getenv("EMAIL"))
     emails_list = gmail_client.obtain_emails(
-        EMAIL_FROM,
+        email_from,
         most_recents_first=True,
         limit=None,
         date_to_search=date_to_search,
     )
+    if len(emails_list) > 0:
+        print(email_from, TransactionEmail(emails_list[0]))
 
     transactions = []
     processor_factory = EmailProcessorFactory()
