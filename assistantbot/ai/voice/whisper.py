@@ -26,7 +26,7 @@ def transcript_audio(audio_file: str) -> str:
     # Set the OpenAI API key
     openai.api_key = os.getenv("OPENAI_API_KEY")
     transcript = openai.Audio.transcribe(
-        "whisper-1", file=open(audio_file, "rb")
+        "whisper-1", file=open(audio_file, "rb"), language="en"
     )
 
     return transcript["text"]
