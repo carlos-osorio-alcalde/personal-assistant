@@ -14,8 +14,8 @@ from assistantbot.ai.text.prompts.pronunciation import (
 from assistantbot.ai.voice.pronunciation import PronunciationAssessment
 from assistantbot.ai.voice.sintetizer import VoiceSintetizer
 from assistantbot.ai.voice.whisper import transcript_audio
+from assistantbot.conversation import TextHandler
 from assistantbot.conversation.base import ConversationHandler
-from assistantbot.conversation.text.handlers import TextHandler
 
 
 class VoiceHandler(ConversationHandler):
