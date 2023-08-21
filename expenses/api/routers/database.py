@@ -139,8 +139,7 @@ def populate_table(
         # Close the connection
         cursor.close()
         return "Operation completed successfully."
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail="Connection failed.")
 
 

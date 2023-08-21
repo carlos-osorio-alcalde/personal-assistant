@@ -1,5 +1,6 @@
 import datetime
 from typing import Literal
+import pytz
 
 from fastapi import APIRouter, Depends
 
@@ -72,5 +73,9 @@ async def get_expenses_a_day_like_today() -> SummaryADayLikeToday:
     """
     # Return the summary
     return SummaryADayLikeToday(
-        **get_summary_a_day_like_today(datetime.datetime.now().isoweekday())
+        **get_summary_a_day_like_today(
+            datetime.datetime.now()
+            .astimezone(pytz.timezone("America/Bogota"))
+            .isoweekday()
+        )
     )
