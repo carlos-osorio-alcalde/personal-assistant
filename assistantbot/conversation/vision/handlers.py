@@ -67,7 +67,7 @@ class VisionHandler(ConversationHandler):
         # Create the entry for the caption in the context of the conversation
         entry_message = IMAGE_CAPTION_PROMPT.format(
             caption=image_caption,
-            image_message=f"Carlos's request: {image_message}",
+            image_message=f"Carlos' request: {image_message}",
         )
 
         # Add the caption to the context of the conversation
