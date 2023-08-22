@@ -1,13 +1,17 @@
 IMAGE_CAPTION_PROMPT = """
-You just received an image from Carlos. This is a caption for the image:
+You just received an image from Carlos. This is the description for the
+image:
 {caption}
 
-Keep in mind that the later caption could not be absolutely accurate, so
-be careful with the information you give to Carlos.
+{image_message}
 
-You need to create a funny answer for Carlos mentioning all the elements of
-the caption. You should demonstrate that you understand the caption and the
-image. Use as many emojis as you want.
+If there is a Carlos's request in this message, answer it. Don't consider
+the later requests before this message, because they are not related to
+the image.
+
+If not, try to describe the image in a way that Carlos can understand.
+Be funny, be creative, and use as much emojis as you want, but keep the
+message short and simple.
 """
 
 USER_PROMPT_TEMPLATE_CAPTIONING = """
