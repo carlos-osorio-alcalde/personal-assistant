@@ -40,7 +40,9 @@ class VisionHandler(ConversationHandler):
         """
         return MessageHandler(self._type, self.callback)
 
-    def _create_response(self, image_caption: str) -> str:
+    def _create_response(
+        self, image_caption: str, image_message: str
+    ) -> str:
         """
         This method is used to create the response for the
         message handler.
@@ -49,6 +51,8 @@ class VisionHandler(ConversationHandler):
         ----------
         image_caption : str
             The caption for the image.
+        image_message : str
+            The message that comes with the image.
 
         Returns
         -------
@@ -61,7 +65,10 @@ class VisionHandler(ConversationHandler):
             self.conversation_chain = TextHandler().conversation_chain
 
         # Create the entry for the caption in the context of the conversation
-        entry_message = IMAGE_CAPTION_PROMPT.format(caption=image_caption)
+        entry_message = IMAGE_CAPTION_PROMPT.format(
+            caption=image_caption,
+            image_message=f"Carlos's request: {image_message}",
+        )
 
         # Add the caption to the context of the conversation
         response_message = self.conversation_chain.predict(
@@ -91,11 +98,16 @@ class VisionHandler(ConversationHandler):
         # Get the image from the message
         image = await update.message.photo[-1].get_file()
 
+        # Get the message that comes with the image
+        image_message = update.message.caption
+
         # Get the caption for the image
         caption = self.vision_captioner.get_caption(image.file_path)
 
         # Get the message using the caption
-        image_response = self._create_response(image_caption=caption)
+        image_response = self._create_response(
+            image_caption=caption, image_message=image_message
+        )
 
         # Send the caption to the user
         await update.message.reply_text(image_response)
