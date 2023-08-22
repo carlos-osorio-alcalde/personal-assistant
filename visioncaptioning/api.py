@@ -1,7 +1,7 @@
 from PIL import Image
 import io
 from fastapi import FastAPI, UploadFile, File
-from transformers import BlipProcessor, BlipForConditionalGeneration
+from transformers import AutoProcessor, AutoModelForCausalLM
 
 # Create FastAPI instance
 app = FastAPI(title="Vision Captioning API", version="0.1.0")
@@ -14,16 +14,13 @@ async def root() -> dict:
     """
     return {"message": "This is the Vision Captioning API"}
 
+
 # Load model and processor
-processor = BlipProcessor.from_pretrained(
-    "Salesforce/blip-image-captioning-base",
-    cache_dir="visioncaptioning/models/",
-    local_files_only=True,
+processor = AutoProcessor.from_pretrained(
+    "microsoft/git-base-coco", cache_dir="visioncaptioning/models/"
 )
-model = BlipForConditionalGeneration.from_pretrained(
-    "Salesforce/blip-image-captioning-base",
-    cache_dir="visioncaptioning/models/",
-    local_files_only=True,
+model = AutoModelForCausalLM.from_pretrained(
+    "microsoft/git-base-coco", cache_dir="visioncaptioning/models/"
 )
 
 
@@ -45,11 +42,17 @@ async def get_caption_image(image: UploadFile = File(...)) -> str:
     image_data = await image.read()
     image_data = Image.open(io.BytesIO(image_data)).convert("RGB")
 
-    # unconditional image captioning
-    inputs = processor(image_data, return_tensors="pt")
+    # Preprocess image
+    pixel_values = processor(
+        images=image_data, return_tensors="pt"
+    ).pixel_values
 
-    output = model.generate(**inputs)
-    return processor.decode(output[0], skip_special_tokens=True)
+    # Generate caption
+    generated_ids = model.generate(pixel_values=pixel_values, max_length=50)
+    generated_caption = processor.batch_decode(
+        generated_ids, skip_special_tokens=True
+    )[0]
+    return generated_caption
 
 
 if __name__ == "__main__":
