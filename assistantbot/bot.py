@@ -46,22 +46,13 @@ def main() -> None:
         app.add_handler(handler.command_handler())
 
     # Add the message handler
-    text_handler = TextHandler()
-    app.add_handler(text_handler.handler())
+    app.add_handler(TextHandler().handler())
 
-    # Add the voice handler
-    app.add_handler(
-        VoiceHandler(
-            conversation_chain=text_handler.conversation_chain
-        ).handler()
-    )
+    # # Add the voice handler
+    app.add_handler(VoiceHandler().handler())
 
     # Add the vision handler
-    app.add_handler(
-        VisionHandler(
-            conversacion_chain=text_handler.conversation_chain
-        ).handler()
-    )
+    app.add_handler(VisionHandler().handler())
 
     # Add the error handler
     app.add_error_handler(error_handler)

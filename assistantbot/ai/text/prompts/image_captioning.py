@@ -1,5 +1,5 @@
 IMAGE_CAPTION_PROMPT_REQUEST = """
-Assume that you just received an image from Carlos.
+Assume that you just received an image from the user.
 This is a description of the image: {caption}
 
 {image_message}
@@ -10,7 +10,7 @@ Your answer:
 """
 
 IMAGE_CAPTION_PROMPT_WITHOUT_REQUEST = """
-Assume that you just received an image from Carlos.
+Assume that you just received an image from the user.
 This is a description of the image: {caption}
 
 Create a message describing the image.
