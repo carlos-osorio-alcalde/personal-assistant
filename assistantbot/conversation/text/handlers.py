@@ -9,6 +9,7 @@ from assistantbot.ai.text.prompts.conversation import (
     CONVERSATION_BASE_TEMPLATE,
 )
 from assistantbot.conversation.base import ConversationHandler
+from assistantbot.utils.security import allowed_user_only
 
 
 class TextHandler(ConversationHandler):
@@ -35,8 +36,9 @@ class TextHandler(ConversationHandler):
         MessageHandler
             The message handler.
         """
-        return MessageHandler(self._type, self.callback)
+        return MessageHandler(self._type, self.callback, block=False)
 
+    @allowed_user_only
     async def callback(
         self, update: Update, context: CallbackContext
     ) -> None:
@@ -60,7 +62,7 @@ class TextHandler(ConversationHandler):
 
         # Predict the response
         try:
-            response_message = self.conversation_chain.predict(
+            response_message = await self.conversation_chain.apredict(
                 input=entry_message
             )
         except Exception:
@@ -73,7 +75,7 @@ class TextHandler(ConversationHandler):
                     I will forget everything we've talked about to \
                     be able to continue our conversation.",
             )
-            response_message = self.conversation_chain.predict(
+            response_message = await self.conversation_chain.apredict(
                 input=entry_message
             )
 

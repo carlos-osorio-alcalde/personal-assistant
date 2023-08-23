@@ -16,6 +16,7 @@ from assistantbot.ai.voice.sintetizer import VoiceSintetizer
 from assistantbot.ai.voice.whisper import transcript_audio
 from assistantbot.conversation import TextHandler
 from assistantbot.conversation.base import ConversationHandler
+from assistantbot.utils.security import allowed_user_only
 
 
 class VoiceHandler(ConversationHandler):
@@ -46,8 +47,17 @@ class VoiceHandler(ConversationHandler):
         )
 
     def handler(self) -> MessageHandler:
-        return MessageHandler(self._type, self.callback)
+        """
+        This function returns the message handler.
 
+        Returns
+        -------
+        MessageHandler
+            The message handler.
+        """
+        return MessageHandler(self._type, self.callback, block=False)
+
+    @allowed_user_only
     async def callback(
         self, update: Update, context: CallbackContext
     ) -> None:
@@ -92,7 +102,7 @@ class VoiceHandler(ConversationHandler):
 
         # Obtain response message
         entry_message = self._transcript_voice_message(f"{output_file}.wav")
-        response_message = self._create_text_response(entry_message)
+        response_message = await self._create_text_response(entry_message)
 
         # Get the final response with the voice message and the
         # pronunciation assessment
@@ -166,7 +176,7 @@ class VoiceHandler(ConversationHandler):
         transcription = transcript_audio(input_file)
         return transcription
 
-    def _create_text_response(self, entry_message: str) -> str:
+    async def _create_text_response(self, entry_message: str) -> str:
         """
         This function creates the text response using the handler of the
         text conversation.
@@ -186,7 +196,7 @@ class VoiceHandler(ConversationHandler):
         if self.conversation_chain is None:
             self.conversation_chain = TextHandler().conversation_chain
 
-        response_message = self.conversation_chain.predict(
+        response_message = await self.conversation_chain.apredict(
             input=entry_message
         )
         return response_message

@@ -10,6 +10,7 @@ from assistantbot.ai.text.prompts.expenses import (
 )
 from assistantbot.commands.base import BaseCommand
 from assistantbot.utils.expenses import get_expenses
+from assistantbot.utils.security import allowed_user_only
 
 
 class GetExpensesCommand(BaseCommand):
@@ -26,6 +27,7 @@ class GetExpensesCommand(BaseCommand):
         self._median_amount_purchases = 0
         self._mean_num_purchases = 0
 
+    @allowed_user_only
     async def command_callback(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
@@ -79,4 +81,6 @@ class GetExpensesCommand(BaseCommand):
         CommandHandler
             The start handler.
         """
-        return CommandHandler(self._command, self.command_callback)
+        return CommandHandler(
+            self._command, self.command_callback, block=False
+        )
