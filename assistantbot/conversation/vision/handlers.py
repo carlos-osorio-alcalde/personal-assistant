@@ -11,6 +11,7 @@ from assistantbot.ai.text.prompts.image_captioning import (
 from assistantbot.ai.vision.captioner import VisionCaptioner
 from assistantbot.conversation import TextHandler
 from assistantbot.conversation.base import ConversationHandler
+from assistantbot.utils.security import allowed_user_only
 
 
 class VisionHandler(ConversationHandler):
@@ -39,9 +40,9 @@ class VisionHandler(ConversationHandler):
         MessageHandler
             The message handler.
         """
-        return MessageHandler(self._type, self.callback)
+        return MessageHandler(self._type, self.callback, block=False)
 
-    def _create_response(
+    async def _create_response(
         self, image_caption: str, image_message: Optional[str] = None
     ) -> str:
         """
@@ -78,12 +79,13 @@ class VisionHandler(ConversationHandler):
         )
 
         # Add the caption to the context of the conversation
-        response_message = self.conversation_chain.predict(
+        response_message = await self.conversation_chain.apredict(
             input=entry_message
         )
 
         return response_message
 
+    @allowed_user_only
     async def callback(
         self, update: Update, context: CallbackContext
     ) -> None:
@@ -112,7 +114,7 @@ class VisionHandler(ConversationHandler):
         caption = self.vision_captioner.get_caption(image.file_path)
 
         # Get the message using the caption
-        image_response = self._create_response(
+        image_response = await self._create_response(
             image_caption=caption, image_message=image_message
         )
 
