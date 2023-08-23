@@ -53,9 +53,9 @@ class PronunciationAssessment:
         elif granularity == "full":
             self.granularity = base_granularity.FullText
 
-    def get_assessment(
+    async def get_assessment(
         self, reference_text: str, input_audio_path: str
-    ) -> Tuple[dict, speechsdk.PronunciationAssessmentResult,]:
+    ) -> Tuple[dict, speechsdk.PronunciationAssessmentResult]:
         """
         This function performs the pronunciation assessment of a given audio
         file and returns the assessment.

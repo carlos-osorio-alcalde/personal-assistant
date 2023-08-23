@@ -9,26 +9,20 @@ from assistantbot.ai.text.prompts.image_captioning import (
     IMAGE_CAPTION_PROMPT_WITHOUT_REQUEST,
 )
 from assistantbot.ai.vision.captioner import VisionCaptioner
-from assistantbot.conversation import TextHandler
 from assistantbot.conversation.base import ConversationHandler
+from assistantbot.conversation.chains import (
+    get_conversation_chain,
+    update_memory,
+)
 from assistantbot.utils.security import allowed_user_only
 
 
 class VisionHandler(ConversationHandler):
-    def __init__(
-        self, conversacion_chain: Optional[ConversationChain] = None
-    ):
+    def __init__(self):
         """
         This object is used to handle the vision conversation.
-
-        Parameters
-        ----------
-        conversacion_chain : Optional[ConversationChain], optional
-            The conversation chain to add the messages to the
-            context of the conversation, by default None
         """
         super().__init__(filters.PHOTO)
-        self.conversation_chain = conversacion_chain
         self.vision_captioner = VisionCaptioner()
 
     def handler(self) -> MessageHandler:
@@ -43,7 +37,11 @@ class VisionHandler(ConversationHandler):
         return MessageHandler(self._type, self.callback, block=False)
 
     async def _create_response(
-        self, image_caption: str, image_message: Optional[str] = None
+        self,
+        user_id: int,
+        image_caption: str,
+        image_message: Optional[str] = None,
+        conversation_chain: Optional[ConversationChain] = None,
     ) -> str:
         """
         This method is used to create the response for the
@@ -61,11 +59,6 @@ class VisionHandler(ConversationHandler):
         str
             The response for the message handler.
         """
-        # If the conversation chain is not specified, use the default one
-        # However, this should not happen
-        if self.conversation_chain is None:
-            self.conversation_chain = TextHandler().conversation_chain
-
         # Create the entry for the caption in the context of the conversation
         entry_message = (
             IMAGE_CAPTION_PROMPT_REQUEST.format(
@@ -79,9 +72,12 @@ class VisionHandler(ConversationHandler):
         )
 
         # Add the caption to the context of the conversation
-        response_message = await self.conversation_chain.apredict(
+        response_message = await conversation_chain.apredict(
             input=entry_message
         )
+
+        # Update the memory
+        update_memory(user_id, conversation_chain)
 
         return response_message
 
@@ -99,6 +95,9 @@ class VisionHandler(ConversationHandler):
         context : CallbackContext
             The context object from Telegram.
         """
+        # Get the conversation chain
+        conversation_chain = get_conversation_chain(update.effective_user.id)
+
         # Send the chat action
         await context.bot.send_chat_action(
             chat_id=update.effective_chat.id, action="upload_photo"
@@ -115,7 +114,10 @@ class VisionHandler(ConversationHandler):
 
         # Get the message using the caption
         image_response = await self._create_response(
-            image_caption=caption, image_message=image_message
+            user_id=update.effective_chat.id,
+            image_caption=caption,
+            image_message=image_message,
+            conversation_chain=conversation_chain,
         )
 
         # Send the caption to the user

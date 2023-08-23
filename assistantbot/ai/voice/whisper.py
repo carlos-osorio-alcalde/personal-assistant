@@ -4,7 +4,7 @@ from pathlib import Path
 import openai
 
 
-def transcript_audio(audio_file: str) -> str:
+async def transcript_audio(audio_file: str) -> str:
     """
     This function uses the OpenAI API to transcript the audio file and
     returns the text.
@@ -25,7 +25,7 @@ def transcript_audio(audio_file: str) -> str:
 
     # Set the OpenAI API key
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    transcript = openai.Audio.transcribe(
+    transcript = await openai.Audio.atranscribe(
         "whisper-1", file=open(audio_file, "rb"), language="en"
     )
 

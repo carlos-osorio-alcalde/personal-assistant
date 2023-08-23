@@ -1,5 +1,5 @@
 import time
-from assistantbot import bot
+from assistantbot import bot, clean_all_conversations
 from contextlib import contextmanager
 
 
@@ -9,6 +9,7 @@ def handle_expections():
         yield
     except (RuntimeWarning, Exception, RuntimeError) as e:
         bot.logger.exception(e)
+        clean_all_conversations()
         time.sleep(5)
 
 

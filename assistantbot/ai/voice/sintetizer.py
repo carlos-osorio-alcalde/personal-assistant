@@ -48,7 +48,9 @@ class VoiceSintetizer:
 
         return self.speech_synthesizer
 
-    def sintetize_text(self, text: str) -> speechsdk.AudioDataStream | None:
+    async def sintetize_text(
+        self, text: str
+    ) -> speechsdk.AudioDataStream | None:
         """
         This function sintetizes a given text and returns the sintetized
         audio.

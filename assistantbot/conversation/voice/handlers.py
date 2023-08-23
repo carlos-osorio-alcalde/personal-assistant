@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Literal, Optional
 
 import soundfile as sf
-from langchain.chains import ConversationChain
 from telegram import Update
 from telegram.ext import CallbackContext, MessageHandler, filters
 
@@ -14,15 +13,16 @@ from assistantbot.ai.text.prompts.pronunciation import (
 from assistantbot.ai.voice.pronunciation import PronunciationAssessment
 from assistantbot.ai.voice.sintetizer import VoiceSintetizer
 from assistantbot.ai.voice.whisper import transcript_audio
-from assistantbot.conversation import TextHandler
 from assistantbot.conversation.base import ConversationHandler
-from assistantbot.utils.security import allowed_user_only
+from assistantbot.conversation.chains import (
+    get_conversation_chain,
+    update_memory,
+)
 
 
 class VoiceHandler(ConversationHandler):
     def __init__(
         self,
-        conversation_chain: Optional[ConversationChain] = None,
         grading_system: Optional[
             Literal["hundred_mark", "five_points"]
         ] = "hundred_mark",
@@ -35,13 +35,13 @@ class VoiceHandler(ConversationHandler):
 
         Parameters
         ----------
-        conversation_chain : Optional[ConversationChain], optional
-            In order to maintain the conversation, the bot needs to know
-            the conversation chain. If this parameter is not specified,
-            the bot will use the default conversation chain, by default None
+        grading_system : Optional[Literal["hundred_mark", "five_points"]]
+            The grading system to use for the pronunciation assessment,
+
+        granularity : Optional[Literal["phoneme", "word", "full"]], optional
+            The granularity to use for the pronunciation assessment,
         """
         super().__init__(filters.VOICE)
-        self.conversation_chain = conversation_chain
         self.pronuntiation_assessment = PronunciationAssessment(
             grading_system=grading_system, granularity=granularity
         )
@@ -57,7 +57,6 @@ class VoiceHandler(ConversationHandler):
         """
         return MessageHandler(self._type, self.callback, block=False)
 
-    @allowed_user_only
     async def callback(
         self, update: Update, context: CallbackContext
     ) -> None:
@@ -101,22 +100,27 @@ class VoiceHandler(ConversationHandler):
         )
 
         # Obtain response message
-        entry_message = self._transcript_voice_message(f"{output_file}.wav")
-        response_message = await self._create_text_response(entry_message)
+        entry_message = await self._transcript_voice_message(
+            f"{output_file}.wav"
+        )
+        response_message = await self._create_text_response(
+            update.effective_user.id, entry_message
+        )
 
         # Get the final response with the voice message and the
         # pronunciation assessment
-
         # Get the pronunciation assessment
-        assessment_message = self._get_pronuntiation_assessment_response(
-            entry_message, f"{output_file}.wav"
+        assessment_message = (
+            await self._get_pronuntiation_assessment_response(
+                entry_message, f"{output_file}.wav"
+            )
         )
 
         # Send the response message via voice
         voice_sintetizer = VoiceSintetizer(
             file_to_save=f"{output_file}_response.wav"
         )
-        voice_sintetizer.sintetize_text(response_message)
+        await voice_sintetizer.sintetize_text(response_message)
 
         # Send the voice message
         await context.bot.send_audio(
@@ -158,7 +162,7 @@ class VoiceHandler(ConversationHandler):
         Path(input_file).unlink()
 
     @staticmethod
-    def _transcript_voice_message(input_file: str) -> str:
+    async def _transcript_voice_message(input_file: str) -> str:
         """
         This function transcripts the voice message and returns the text
         using Whisper API.
@@ -173,10 +177,12 @@ class VoiceHandler(ConversationHandler):
         str
             The text of the voice message.
         """
-        transcription = transcript_audio(input_file)
+        transcription = await transcript_audio(input_file)
         return transcription
 
-    async def _create_text_response(self, entry_message: str) -> str:
+    async def _create_text_response(
+        self, user_id: int, entry_message: str
+    ) -> str:
         """
         This function creates the text response using the handler of the
         text conversation.
@@ -191,17 +197,19 @@ class VoiceHandler(ConversationHandler):
         str
             The text response.
         """
-        # If the conversation chain is not specified, use the default one
-        # However, this should not happen
-        if self.conversation_chain is None:
-            self.conversation_chain = TextHandler().conversation_chain
+        # Get the conversation chain
+        conversation_chain = get_conversation_chain(user_id)
 
-        response_message = await self.conversation_chain.apredict(
+        response_message = await conversation_chain.apredict(
             input=entry_message
         )
+
+        # Update the memory
+        update_memory(user_id, conversation_chain)
+
         return response_message
 
-    def _get_pronuntiation_assessment_response(
+    async def _get_pronuntiation_assessment_response(
         self, reference_text: str, input_audio_path: str
     ) -> str:
         """
@@ -223,7 +231,7 @@ class VoiceHandler(ConversationHandler):
         (
             json_recognition_result,
             assessment_result,
-        ) = self.pronuntiation_assessment.get_assessment(
+        ) = await self.pronuntiation_assessment.get_assessment(
             reference_text, input_audio_path
         )
 
