@@ -11,7 +11,7 @@ from assistantbot.ai.text.prompts.pronunciation import (
     WORDS_PRONUNCIATION_ASSESSMENT_BASE,
 )
 from assistantbot.ai.voice.pronunciation import PronunciationAssessment
-from assistantbot.ai.voice.sintetizer import VoiceSintetizer
+from assistantbot.ai.voice.synthesizer import VoiceSynthesizer
 from assistantbot.ai.voice.whisper import transcript_audio
 from assistantbot.conversation.base import ConversationHandler
 from assistantbot.conversation.chains import (
@@ -117,7 +117,7 @@ class VoiceHandler(ConversationHandler):
         )
 
         # Send the response message via voice
-        voice_sintetizer = VoiceSintetizer(
+        voice_sintetizer = VoiceSynthesizer(
             file_to_save=f"{output_file}_response.wav"
         )
         await voice_sintetizer.sintetize_text(response_message)
