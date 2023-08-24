@@ -256,6 +256,7 @@ class VoiceHandler(ConversationHandler):
                 # Get the string of the syllabes
                 syllabes_string = "".join(
                     f"{s.syllabe} ({s.accuracy_score}) "
+                    + f"{'❗️' if s.accuracy_score <= 85 else '✅'}"
                     for s in word.syllabes
                 )
 
