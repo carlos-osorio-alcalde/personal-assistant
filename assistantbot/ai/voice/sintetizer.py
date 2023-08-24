@@ -1,16 +1,26 @@
 import os
+from typing import Union
 
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
 
 class VoiceSintetizer:
     def __init__(
-        self, voice: str = "en-US-SaraNeural", file_to_save: str = None
+        self,
+        voice: str = "en-US-SaraNeural",
+        style: str = "cheerful",
+        file_to_save: str = None,
     ):
+        """
+        This class sintetizes a given text and returns the sintetized
+        audio.
+        """
         self._voice = voice
+        self._style = style
         self._output_file = file_to_save
         self._speech_synthesizer = self._get_sintetizer()
 
@@ -48,9 +58,29 @@ class VoiceSintetizer:
 
         return self.speech_synthesizer
 
+    def _create_ssl(self, text: str) -> str:
+        """
+        This method creates a speech synthesis markup language (SSML) string
+        with the given text and style.
+
+        Parameters
+        ----------
+        text : str
+            The text to sintetize.
+
+        Returns
+        -------
+        str
+            The SSML string.
+        """
+        head1 = f'<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="{self._voice}"><s />'  # noqa
+        head2 = f'<mstts:express-as style="{self._style}"> {text} </mstts:express-as><s /></voice></speak>'  # noqa
+
+        return head1 + head2
+
     async def sintetize_text(
         self, text: str
-    ) -> speechsdk.AudioDataStream | None:
+    ) -> Union[speechsdk.AudioDataStream, None]:
         """
         This function sintetizes a given text and returns the sintetized
         audio.
@@ -66,5 +96,8 @@ class VoiceSintetizer:
             The audio data stream with the sintetized audio.
         """
         # Synthesizes the received text to speech.
-        result = self.speech_synthesizer.speak_text_async(text).get()
+        result = self.speech_synthesizer.speak_ssml_async(
+            self._create_ssl(text)
+        ).get()
+
         return result if text is not None else None

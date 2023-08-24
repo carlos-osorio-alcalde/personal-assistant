@@ -45,14 +45,15 @@ def main() -> None:
     for handler in temperature_handlers:
         app.add_handler(handler.command_handler())
 
-    # Add the message handler
-    app.add_handler(TextHandler().handler())
+    # Add the conversation handlers
+    conversation_handlers = (
+        TextHandler().handler(),
+        VoiceHandler().handler(),
+        VisionHandler().handler(),
+    )
 
-    # # Add the voice handler
-    app.add_handler(VoiceHandler().handler())
-
-    # Add the vision handler
-    app.add_handler(VisionHandler().handler())
+    for handler in conversation_handlers:
+        app.add_handler(handler)
 
     # Add the error handler
     app.add_error_handler(error_handler)
