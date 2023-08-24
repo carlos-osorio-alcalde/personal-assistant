@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class VoiceSintetizer:
+class VoiceSynthesizer:
     def __init__(
         self,
         voice: str = "en-US-SaraNeural",
