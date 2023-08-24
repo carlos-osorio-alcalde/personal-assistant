@@ -16,28 +16,28 @@ class VoiceSynthesizer:
         file_to_save: str = None,
     ):
         """
-        This class sintetizes a given text and returns the sintetized
+        This class sintetizes a given text and returns the synthetized
         audio.
         """
         self._voice = voice
         self._style = style
         self._output_file = file_to_save
-        self._speech_synthesizer = self._get_sintetizer()
+        self._speech_synthesizer = self._get_synthetizer()
 
-    def _get_sintetizer(self) -> speechsdk.SpeechSynthesisResult:
+    def _get_synthetizer(self) -> speechsdk.SpeechSynthesisResult:
         """
-        This function sintetizes a given text and returns the sintetized
+        This function synthetizes a given text and returns the synthetized
         audio.
 
         Parameters
         ----------
         text : str
-            The text to sintetize.
+            The text to synthetized.
 
         Returns
         -------
         speechsdk.SpeechSynthesisResult
-            The speech sintetized object.
+            The speech synthetized object.
         """
         speech_config = speechsdk.SpeechConfig(
             subscription=os.getenv("AZURE_SPEECH_SUBSCRIPTION_KEY"),
@@ -78,22 +78,22 @@ class VoiceSynthesizer:
 
         return head1 + head2
 
-    async def sintetize_text(
+    async def synthetize_text(
         self, text: str
     ) -> Union[speechsdk.AudioDataStream, None]:
         """
-        This function sintetizes a given text and returns the sintetized
+        This function sintetizes a given text and returns the synthetized
         audio.
 
         Parameters
         ----------
         text : str
-            The text to sintetize.
+            The text to synthetize.
 
         Returns
         -------
         speechsdk.AudioDataStream
-            The audio data stream with the sintetized audio.
+            The audio data stream with the synthetize audio.
         """
         # Synthesizes the received text to speech.
         result = self.speech_synthesizer.speak_ssml_async(
