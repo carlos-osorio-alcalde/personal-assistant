@@ -275,12 +275,35 @@ class VoiceHandler(ConversationHandler):
                 tag = "s"
             tagged_text += f"<{tag}>{word.word}</{tag}> "
 
+        def __create_score_assessment(score: int) -> str:
+            """
+            This function creates a string with the score and the emoji
+            depending on the score.
+
+            Parameters
+            ----------
+            score : int
+                The score.
+
+            Returns
+            -------
+            str
+                The string with the score and the emoji.
+            """
+            return str(score) + f"{'❗️' if score <= 85 else '✅'}"
+
         # Create the assessment string for global assessment
         assessment_global_string = GLOBAL_PRONUNCIATION_ASSESSMENT.format(
             phrase=tagged_text,
-            pronunciation_score=global_assessment.pronunciation_score,
-            accuracy_score=global_assessment.accuracy_score,
-            fluency_score=global_assessment.fluency_score,
+            pronunciation_score=__create_score_assessment(
+                global_assessment.pronunciation_score
+            ),
+            accuracy_score=__create_score_assessment(
+                global_assessment.accuracy_score
+            ),
+            fluency_score=__create_score_assessment(
+                global_assessment.fluency_score
+            ),
         )
 
         if assessment_words_string == WORDS_PRONUNCIATION_ASSESSMENT_BASE:
