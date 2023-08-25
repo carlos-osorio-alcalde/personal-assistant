@@ -118,15 +118,14 @@ class VoiceHandler(ConversationHandler):
 
         # Send the response message via voice
         voice_synthetizer = VoiceSynthesizer(
-            file_to_save=f"{output_file}_response.wav"
+            file_to_save=f"{output_file}_response.ogg"
         )
         await voice_synthetizer.synthetize_text(response_message)
 
         # Send the voice message
-        await context.bot.send_audio(
+        await context.bot.send_voice(
             chat_id=update.effective_chat.id,
-            audio=open(f"{output_file}_response.wav", "rb"),
-            title="This is my response",
+            voice=open(f"{output_file}_response.ogg", "rb"),
             caption=response_message[0:1024],
         )
 
@@ -139,7 +138,7 @@ class VoiceHandler(ConversationHandler):
 
         # Delete the .wav files
         Path(f"{output_file}.wav").unlink()
-        Path(f"{output_file}_response.wav").unlink()
+        Path(f"{output_file}_response.ogg").unlink()
 
     @staticmethod
     def _process_incoming_audio(input_file: str, output_file: str) -> None:
