@@ -117,10 +117,10 @@ class VoiceHandler(ConversationHandler):
         )
 
         # Send the response message via voice
-        voice_sintetizer = VoiceSynthesizer(
+        voice_synthetizer = VoiceSynthesizer(
             file_to_save=f"{output_file}_response.wav"
         )
-        await voice_sintetizer.sintetize_text(response_message)
+        await voice_synthetizer.synthetize_text(response_message)
 
         # Send the voice message
         await context.bot.send_audio(
@@ -255,7 +255,7 @@ class VoiceHandler(ConversationHandler):
             if word.accuracy_score <= 95:
                 # Get the string of the syllabes
                 syllabes_string = "".join(
-                    f"{s.syllabe} ({s.accuracy_score}) "
+                    f"{s.syllabe} ({s.accuracy_score})"
                     + f"{'❗️' if s.accuracy_score <= 85 else '✅'}"
                     for s in word.syllabes
                 )
