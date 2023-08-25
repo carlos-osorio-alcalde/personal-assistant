@@ -33,10 +33,10 @@ async def command_callback_test(
     return ConversationHandler.END
 
 
-class EndCorrectModeCommand(BaseCommand):
+class EndCorrectionModeCommand(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._command = "end_correct_mode"
+        self._command = "end_correction_mode"
 
     @staticmethod
     async def command_callback(

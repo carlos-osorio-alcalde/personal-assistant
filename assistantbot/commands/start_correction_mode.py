@@ -13,17 +13,19 @@ from assistantbot.ai.text.prompts.correct_mode import (
     USER_PROMPT_TEMPLATE,
 )
 from assistantbot.commands.base import BaseCommand
-from assistantbot.commands.end_correct_mode import EndCorrectModeCommand
+from assistantbot.commands.end_correction_mode import (
+    EndCorrectionModeCommand,
+)
 
 # This variable will store the message to correct
 state_message = ""
 
 
-class StartCorrectModeCommand(BaseCommand):
+class StartCorrectionModeCommand(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._command = "start_correct_mode"
-        self._fallback_command = "end_correct_mode"
+        self._command = "start_correction_mode"
+        self._fallback_command = "end_correction_mode"
 
     @staticmethod
     async def command_callback(
@@ -109,7 +111,7 @@ class StartCorrectModeCommand(BaseCommand):
             fallbacks=[
                 CommandHandler(
                     self._fallback_command,
-                    EndCorrectModeCommand().command_callback,
+                    EndCorrectionModeCommand().command_callback,
                 )
             ],
         )
