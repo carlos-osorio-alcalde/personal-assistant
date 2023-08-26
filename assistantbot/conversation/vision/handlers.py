@@ -14,7 +14,6 @@ from assistantbot.conversation.chains import (
     get_conversation_chain,
     update_memory,
 )
-from assistantbot.utils.security import allowed_user_only
 
 
 class VisionHandler(ConversationHandler):
@@ -81,7 +80,6 @@ class VisionHandler(ConversationHandler):
 
         return response_message
 
-    @allowed_user_only
     async def callback(
         self, update: Update, context: CallbackContext
     ) -> None:
