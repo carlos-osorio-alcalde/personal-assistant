@@ -124,7 +124,7 @@ class VoiceHandler(ConversationHandler):
         # Get the final response with the voice message and the
         # pronunciation assessment
         # Get the pronunciation assessment
-        try:                
+        try:
             assessment_message = (
                 await self._get_pronuntiation_assessment_response(
                     entry_message, f"{output_file}.wav"
