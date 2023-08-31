@@ -132,8 +132,8 @@ class VoiceHandler(ConversationHandler):
             )
         except Exception as e:
             logger.error(e)
-            assessment_message = """Well, something happened and I wasn't able
-            to assess your pronunciation 🫠. This could happen when
+            assessment_message = """Well, something happened and I wasn't
+            able to assess your pronunciation 🫠. This could happen when
             the message is very long or when the message contains a lot of
             words. I'm working on it to fix it as soon as possible! 🛠"""
 
