@@ -10,6 +10,7 @@ from assistantbot.ai.text.prompts.pronunciation import (
     WORD_PRONUNCIATION_ASSESSMENT_PARTICULAR,
     WORDS_PRONUNCIATION_ASSESSMENT_BASE,
 )
+from assistantbot.logs.configuration import logger
 from assistantbot.ai.voice.pronunciation import PronunciationAssessment
 from assistantbot.ai.voice.synthesizer import VoiceSynthesizer
 from assistantbot.ai.voice.whisper import transcript_audio
@@ -107,15 +108,6 @@ class VoiceHandler(ConversationHandler):
             update.effective_user.id, entry_message
         )
 
-        # Get the final response with the voice message and the
-        # pronunciation assessment
-        # Get the pronunciation assessment
-        assessment_message = (
-            await self._get_pronuntiation_assessment_response(
-                entry_message, f"{output_file}.wav"
-            )
-        )
-
         # Send the response message via voice
         voice_synthetizer = VoiceSynthesizer(
             file_to_save=f"{output_file}_response.ogg"
@@ -128,6 +120,22 @@ class VoiceHandler(ConversationHandler):
             voice=open(f"{output_file}_response.ogg", "rb"),
             caption=response_message[0:1024],
         )
+
+        # Get the final response with the voice message and the
+        # pronunciation assessment
+        # Get the pronunciation assessment
+        try:                
+            assessment_message = (
+                await self._get_pronuntiation_assessment_response(
+                    entry_message, f"{output_file}.wav"
+                )
+            )
+        except Exception as e:
+            logger.error(e)
+            assessment_message = """Well, something happened and I wasn't able
+            to assess your pronunciation 🫠. This could happen when
+            the message is very long or when the message contains a lot of
+            words. I'm working on it to fix it as soon as possible! 🛠"""
 
         # Send the assessment message
         await context.bot.send_message(
