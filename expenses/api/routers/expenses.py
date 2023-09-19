@@ -1,7 +1,7 @@
 import datetime
 from typing import Literal
-import pytz
 
+import pytz
 from fastapi import APIRouter, Depends
 
 from expenses.api.schemas import SummaryADayLikeToday, SummaryTransactionInfo

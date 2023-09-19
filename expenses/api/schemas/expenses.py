@@ -49,3 +49,12 @@ class SummaryADayLikeToday(BaseModel):
 
     mean_number_of_purchases: float | None
     median_amount_of_purchases: float | None
+
+
+class AnomalyPredictionOutput(BaseModel):
+    """
+    This class represents the input of the anomaly prediction.
+    """
+
+    score: float
+    prediction: int
