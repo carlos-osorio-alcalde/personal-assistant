@@ -1,5 +1,5 @@
 import datetime
-from typing import Literal
+from typing import List, Literal
 
 import pytz
 from fastapi import APIRouter, Depends
@@ -13,11 +13,42 @@ from expenses.api.utils import (
     get_transactions_from_database,
     process_transactions_api_expenses,
 )
+from expenses.processors.schemas import TransactionInfo
 
 router = APIRouter(prefix="/expenses")
 
 
-# Create the router
+# Function to get the transactions from the database
+def get_gross_transactions(
+    timeframe: Literal["daily", "weekly", "partial_weekly", "monthly"]
+) -> List[TransactionInfo]:
+    """
+    This function returns the full transactions of the current timeframe
+
+    Returns
+    -------
+    List[TransactionInfo]
+        The summary of the expenses of the day, week or month.
+    """
+    # Get the date to search
+    date_to_search = get_date_from_search(timeframe)
+
+    # Search in the database for the transactions
+    transactions_from_db = get_transactions_from_database(date_to_search)
+
+    # If there are not transactions in the database, search in the API
+    # and process the transactions.
+    transactions = (
+        transactions_from_db
+        if len(transactions_from_db) > 0
+        else get_transactions(date_to_search)
+    )
+
+    return transactions
+
+
+# Create the endpoint to get the summary of the expenses of the day, week or
+# month
 @router.get(
     "/{timeframe}",
     response_model=SummaryTransactionInfo,
@@ -40,21 +71,9 @@ async def get_expenses(
     SummaryTransactionInfo
         The summary of the expenses of the day, week or month.
     """
-    # Get the date to search
-    date_to_search = get_date_from_search(timeframe)
-
-    # Search in the database for the transactions
-    transactions_from_db = get_transactions_from_database(date_to_search)
-
-    # If there are not transactions in the database, search in the API
-    # and process the transactions.
-    transactions = (
-        transactions_from_db
-        if len(transactions_from_db) > 0
-        else get_transactions(date_to_search)
+    return process_transactions_api_expenses(
+        get_gross_transactions(timeframe)
     )
-
-    return process_transactions_api_expenses(transactions)
 
 
 @router.get(
@@ -79,3 +98,21 @@ async def get_expenses_a_day_like_today() -> SummaryADayLikeToday:
             .isoweekday()
         )
     )
+
+
+# Create the endpoint to get all the transactions of the current day
+@router.get(
+    "/get_full_transactions_day/",
+    response_model=List[TransactionInfo],
+    dependencies=[Depends(check_access_token)],
+)
+async def get_full_transactions() -> List[TransactionInfo]:
+    """
+    This function returns the full transactions of the current day
+
+    Returns
+    -------
+    List[TransactionInfo]
+        The summary of the expenses of the day, week or month.
+    """
+    return get_gross_transactions("daily")
