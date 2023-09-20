@@ -57,4 +57,4 @@ class AnomalyPredictionOutput(BaseModel):
     """
 
     score: float
-    prediction: int
+    prediction: str

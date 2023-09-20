@@ -1,7 +1,9 @@
 import os
 import pickle
+import tempfile
 from typing import Literal
 
+import neptune
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from numpy import where
@@ -10,7 +12,7 @@ from sklearn.ensemble import IsolationForest
 
 from expenses.api.schemas import AnomalyPredictionOutput
 from expenses.api.security import check_access_token
-from expenses.api.utils import get_cursor
+from expenses.api.utils import get_cursor, get_model
 
 router = APIRouter(prefix="/monitoring")
 
@@ -27,14 +29,14 @@ def retrain_anomaly_model() -> str:
 
     # Get the data from the database
     query = """
-        SELECT 
-            CAST(datetime AS DATE) AS date_, 
-            (-1) * AVG(CAST(amount AS float)) AS avg_amount, 
+        SELECT
+            CAST(datetime AS DATE) AS date_,
+            (-1) * AVG(CAST(amount AS float)) AS avg_amount,
             (-1) * MIN(CAST(amount AS float)) AS max_amount,
             COUNT(DISTINCT id) AS total_trx
         FROM [dbo].[transactions]
-        WHERE transaction_type = 'Compra' or 
-              transaction_type = 'QR' or 
+        WHERE transaction_type = 'Compra' or
+              transaction_type = 'QR' or
               transaction_type = 'Transferencia'
         GROUP BY CAST(datetime AS DATE)
         ORDER BY CAST(datetime AS DATE) DESC;
@@ -48,12 +50,40 @@ def retrain_anomaly_model() -> str:
     # Create the dataset
     X = df[["avg_amount", "max_amount", "total_trx", "weekend"]]
 
+    # Initialize Neptune run to log the model
+    run = neptune.init_run(
+        project="carlos.osorio/expenses-anomaly",
+        api_token=os.environ["NEPTUNE_API_TOKEN"] + "==",
+    )
+
     # Fit the Isolation Forest model
-    model = IsolationForest()
+    params = {
+        "max_samples": 150,
+        "contamination": "auto",
+        "bootstrap": True,
+    }
+    model = IsolationForest(**params)
     model.fit(X)
 
-    # Save the model
-    pickle.dump(model, open("expenses/api/anomaly_model.pkl", "wb"))
+    # Save the model to a temporary file
+    with tempfile.NamedTemporaryFile(
+        suffix=".pkl", delete=False
+    ) as temp_file:
+        pickle.dump(model, temp_file)
+
+        # Log the model
+        run["parameters"] = params
+        run["number_of_samples"] = X.shape[0]
+
+        model = neptune.init_model_version(
+            model="EX-ANOMODEL",
+            project="carlos.osorio/expenses-anomaly",
+            api_token=os.environ["NEPTUNE_API_TOKEN"] + "==",
+        )
+        model["model"].upload(temp_file.name)
+        model.change_stage("staging")
+
+    run.stop()
     return "Model retrained successfully"
 
 
@@ -80,25 +110,27 @@ def predict_anomaly(
     Tuple[float, int]
         The score and the prediction.
     """
-    # Check if the model exists
-    if not os.path.exists("expenses/api/anomaly_model.pkl"):
-        raise HTTPException(
-            status_code=500,
-            detail="The anomaly model has not been trained yet.",
-        )
-
-    # Load the model
-    model = pickle.load(open("expenses/api/anomaly_model.pkl", "rb"))
+    # This is made here to avoid loading the model at the start of the
+    # application. This is efficient since, altough the model is loaded
+    # every time the endpoint is called, the endpoint is called less
+    # frequently than the application is started.
+    model = get_model()
 
     # Data to predict
     data = [
         [avg_amount, max_amount, total_trx, 1 if weekend == "yes" else 0]
     ]
 
-    # Predict the anomaly
-    prediction = model.predict(data)
+    try:
+        # Predict the anomaly
+        prediction = model.predict(data)
 
-    # Get the score
-    score = model.score_samples(data)
+        # Get the score
+        score = model.score_samples(data)
 
-    return AnomalyPredictionOutput(score=score[0], prediction=prediction[0])
+        return AnomalyPredictionOutput(
+            score=score[0],
+            prediction="anomaly" if prediction[0] == -1 else "normal",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
