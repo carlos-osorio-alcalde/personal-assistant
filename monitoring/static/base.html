@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* Light gray background for the entire body */
+            margin: 0;
+            padding: 0;
+            text-align: center; /* Center text in the body */
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff; /* White background for the container */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left; /* Left-align text within the container */
+        }
+        h1 {
+            color: #333; /* Dark gray color for the header text */
+            text-align: center; /* Center the header text */
+            font-size: 32px; /* Increase font size for the header */
+            margin-bottom: 20px; /* Add some spacing below the header */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2; /* Light gray background for table header */
+        }
+        .summary-box {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
+            background-color: #f7f7f7; /* Light gray background for the summary box */
+        }
+        .summary-header {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: black; /* Dark gray color for the header */
+        }
+        .summary-data {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333; /* Dark gray color for the data */
+        }
+        .anomalous-box {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
+            background-color: #e74c3c; /* Red background for anomalous message box */
+            color: #fff; /* White text color for the message */
+        }
+        .normal-box {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
+            background-color: #2ecc71; /* Green background for normal message box */
+            color: #fff; /* White text color for the message */
+        }
+        .anomalous-image {
+            width: 50px;
+            height: 50px;
+            background-color: #fff; /* White background for the image */
+            border-radius: 50%; /* Make the image circular */
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 36px; /* Increase font size for the "X" */
+            line-height: 50px; /* Center vertically */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Transaction Summary</h1>
+        <p>Here is a summary of today's transactions:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction type</th>
+                    <th>Merchant</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.transaction_type }}</td>
+                        <td>{{ transaction.merchant }}</td>
+                        <td>{{ transaction.amount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="summary-box">
+            <div class="summary-header">Summary</div>
+            <div class="summary-data">Number of Transactions: {{ summary.num_transactions }}</div>
+            <div class="summary-data">Sum of Transactions: ${{ summary.sum_transactions }}</div>
+            <div class="summary-data">Average Amount: ${{ summary.avg_amount }}</div>
+        </div>
+        
+        {% if day_status == "anomalous" %}
+        <div class="anomalous-box">
+            <div class="anomalous-image">&times;</div>
+            <p>This day was {{ day_status }}.</p>
+        </div>
+        {% else %}
+        <div class="normal-box">
+            <div class="anomalous-image">&#10003;</div>
+            <p>This day was {{ day_status }}.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
