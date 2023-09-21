@@ -8,6 +8,7 @@ import requests
 from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 from numpy import average
+import matplotlib.pyplot as plt
 
 from monitoring.email import send_email
 
@@ -119,6 +120,26 @@ def check_anomaly(expenses_values: dict) -> Literal["normal", "anomaly"]:
     return response.json()["prediction"]
 
 
+def get_average_normal_values() -> float:
+    """
+    This function calls the endpoint to obtain the normal values
+
+    Returns
+    -------
+    float
+        The median of the amount spent in a normal day.
+    """
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {os.getenv('API_EXPENSES_TOKEN')}",
+    }
+    response = requests.get(
+        "https://personal-expenses.purplesky-efe9a7f4.eastus.azurecontainerapps.io/expenses/a_day_like_today/",  # noqa
+        headers=headers,
+    )
+    return (-1) * response.json()["median_amount_of_purchases"]
+
+
 def create_html_email(transactions: List[dict]) -> str:
     """
     Create the html email to send.
@@ -144,40 +165,151 @@ def create_html_email(transactions: List[dict]) -> str:
     # Load your HTML template
     template = env.get_template("base.html")
 
-    # Define the data and format amount as $0.00
-    transactions_short = [
-        {
-            "transaction_type": transaction["transaction_type"],
-            "merchant": transaction["merchant"],
-            "amount": f"${transaction['amount']:.2f}",
-        }
-        for transaction in transactions
-    ]
-
+    # Get the summary of the transactions
     summary = {
-        "num_transactions": len(transactions_short),
-        "sum_transactions": sum(
-            [transaction["amount"] for transaction in transactions_short]
+        "num_transactions": len(transactions),
+        "sum_transactions": "${:,.2f}".format(
+            (-1)
+            * sum([transaction["amount"] for transaction in transactions])
         ),
-        "avg_amount": average(
-            [transaction["amount"] for transaction in transactions_short]
+        "avg_amount": "${:,.2f}".format(
+            (-1)
+            * average(
+                [transaction["amount"] for transaction in transactions]
+            )
         ),
     }
 
     # Render the template with the data
     rendered_template = template.render(
-        transactions=transactions_short,
+        date_value=datetime.datetime.now()
+        .astimezone(pytz.timezone("America/Bogota"))
+        .date(),
+        transactions=[
+            {
+                "transaction_type": transaction["transaction_type"],
+                "merchant": transaction["merchant"],
+                "amount": "${:,.2f}".format((-1) * transaction["amount"]),
+            }
+            for transaction in transactions
+        ],
         summary=summary,
         day_status=day_status,
+        historical_average_amount="${:,.2f}".format(
+            get_average_normal_values()
+        ),
+        relationship="{:.1f}".format(
+            (-1)
+            * sum([transaction["amount"] for transaction in transactions])
+            / get_average_normal_values()
+        ),
     )
 
     return rendered_template
+
+
+def create_step_plot(transactions: List[dict]) -> plt.figure:
+    """
+    This function creates a step plot of the transactions based on the
+    time of the transaction.
+
+    Parameters
+    ----------
+    transactions : List[dict]
+        The transactions of the current day.
+
+    Returns
+    -------
+    plt.figure
+        The step plot of the transactions.
+    """
+    # Create the figure
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(1, 1, 1)
+
+    # Times of the transactions
+    datetimes = (
+        [datetime.datetime.now().replace(hour=0, minute=0, second=0)]
+        + [
+            datetime.datetime.fromisoformat(transaction["datetime"])
+            for transaction in transactions
+        ]
+        + [datetime.datetime.now().replace(hour=23, minute=59, second=59)]
+    )
+    values = (
+        [0]
+        + [
+            (-1)
+            * sum(
+                [transaction["amount"] for transaction in transactions[:i]]
+            )
+            for i in range(len(transactions))
+        ]
+        + [
+            (-1)
+            * sum([transaction["amount"] for transaction in transactions])
+        ]
+    )
+
+    # Create the plot. Add the 0:00:00 hours and the 23:59:59 hours. For
+    # the 0:00:00 hours, start by zero and for the 23:59:59 hours, end
+    # by the number of the last transaction. The y values must be the
+    # rolling sum of the amount.
+    ax.step(datetimes, values, color="#29A7A0")
+
+    # Create points in the plot
+    ax.plot(datetimes, values, "o", color="#29A7A0")
+
+    # In the xticks, show uniquely the hours without the date
+    ax.set_xticks(
+        [
+            datetime.datetime.now().replace(hour=i, minute=0, second=0)
+            for i in range(0, 24, 3)
+        ]
+    )
+    ax.set_xticklabels(
+        [
+            datetime.datetime.now()
+            .replace(hour=i, minute=0, second=0)
+            .time()
+            .strftime("%H:%M")
+            for i in range(0, 24, 3)
+        ]
+    )
+
+    # Style the yaxis as $10,000.00
+    ax.yaxis.set_major_formatter("${x:,.2f}")
+
+    # Delete the box
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    # Add the size of the xticks and yticks
+    ax.tick_params(axis="x", labelsize=17, colors="#29A7A0")
+    ax.tick_params(axis="y", labelsize=17, colors="#29A7A0")
+
+    # Set the background color of the entire picture to f7f7f7
+    ax.set_facecolor("none")
+    fig.patch.set_facecolor("none")
+
+    # Save the figure
+    plt.savefig("monitoring/static/step_plot.png", bbox_inches="tight")
+
+    return fig
 
 
 if __name__ == "__main__":
     # Get the transactions
     gross_transactions = get_transactions(return_as_pandas=False)
     html = create_html_email(gross_transactions)
+
+    # Create the step plot
+    create_step_plot(gross_transactions)
+
+    # Save the html
+    with open("monitoring/static/processed_transactions.html", "w") as f:
+        f.write(html)
 
     # Send the email
     send_email(html)

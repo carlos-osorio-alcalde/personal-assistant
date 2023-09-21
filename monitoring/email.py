@@ -1,6 +1,7 @@
 import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from smtplib import SMTP_SSL, SMTP_SSL_PORT
 
 from dotenv import load_dotenv
@@ -28,6 +29,11 @@ def send_email(html_body: str) -> None:
     email_message.add_header("Subject", "Expenses inform")
     email_message.add_header("X-Priority", "1")
     email_message.attach(MIMEText(html_body, "html"))
+    step_plot_image = MIMEImage(
+        open("monitoring/static/step_plot.png", "rb").read()
+    )
+    step_plot_image.add_header("Content-ID", "<step_plot>")
+    email_message.attach(step_plot_image)
 
     # Connect, authenticate, and send mail
     smtp_server = SMTP_SSL("imap.gmail.com", port=SMTP_SSL_PORT)

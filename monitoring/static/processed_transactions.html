@@ -143,7 +143,7 @@
 <body>
     <div class="container">
         <h1>Daily Transaction Summary 💵</h1>
-        <h4> Date: {{ date_value }}</h4>
+        <h4> Date: 2023-09-20</h4>
         <h4>Here is a summary of today's transactions:</h4>
         
         <table>
@@ -155,13 +155,31 @@
                 </tr>
             </thead>
             <tbody>
-                {% for transaction in transactions %}
+                
                     <tr>
-                        <td>{{ transaction.transaction_type }}</td>
-                        <td>{{ transaction.merchant }}</td>
-                        <td>{{ transaction.amount }}</td>
+                        <td>Compra</td>
+                        <td>EXLIBRIS CAFE LIBR Y</td>
+                        <td>$11,500.00</td>
                     </tr>
-                {% endfor %}
+                
+                    <tr>
+                        <td>Transferencia</td>
+                        <td>61737774375</td>
+                        <td>$22,000.00</td>
+                    </tr>
+                
+                    <tr>
+                        <td>Compra</td>
+                        <td>KALDI KAFFE RESTAURA</td>
+                        <td>$32,900.00</td>
+                    </tr>
+                
+                    <tr>
+                        <td>Compra</td>
+                        <td>JUMBO DE LA 65</td>
+                        <td>$129,800.00</td>
+                    </tr>
+                
             </tbody>
         </table>
         
@@ -172,29 +190,24 @@
 
         <div class="summary-box">
             <div class="summary-header">Summary</div>
-            <div class="summary-data">Number of Transactions: {{ summary.num_transactions }}</div>
-            <div class="summary-data">Sum of Transactions: {{ summary.sum_transactions }}</div>
-            <div class="summary-data">Average Amount: {{ summary.avg_amount }}</div>
+            <div class="summary-data">Number of Transactions: 4</div>
+            <div class="summary-data">Sum of Transactions: $196,200.00</div>
+            <div class="summary-data">Average Amount: $49,050.00</div>
         </div>
         
         <div class="comparison-box">
             <div class="comparison-header">How was it today comparing with the past?</div>
-            <div class="comparison-data">Sum of Today's Transactions: {{ summary.sum_transactions }}</div>
-            <div class="comparison-data">Historical Average Amount: {{ historical_average_amount }}</div>
-            <div class="comparison-data">Comparing to a normal day, today's spending was {{ relationship }}x</div>
+            <div class="comparison-data">Sum of Today's Transactions: $196,200.00</div>
+            <div class="comparison-data">Historical Average Amount: $72,096.00</div>
+            <div class="comparison-data">Comparing to a normal day, today's spending was 2.7x</div>
         </div>
 
-        {% if day_status == "anomalous" %}
-        <div class="anomalous-box">
-            <div class="anomalous-image">&times;</div>
-            <p class="text-anomaly">This was an {{ day_status }} day</p>
-        </div>
-        {% else %}
+        
         <div class="normal-box">
             <div class="anomalous-image">&#10003;</div>
-            <p class="text-anomaly">This was a {{ day_status }} day</p>
+            <p class="text-anomaly">This was a normal day</p>
         </div>
-        {% endif %}
+        
     </div>
 </body>
 </html>
