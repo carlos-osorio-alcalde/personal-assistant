@@ -2,7 +2,6 @@ import datetime
 import os
 from typing import List, Literal, Union
 
-import numpy as np
 import pandas as pd
 import pytz
 import requests
@@ -41,6 +40,17 @@ def get_transactions(
         "Authorization": f"Bearer {os.getenv('API_EXPENSES_TOKEN')}",
     }
     response = requests.get(url, headers=headers)
+
+    # Check if the response is 200
+    if response.status_code != 200:
+        return [
+            {
+                "datetime": datetime.datetime.now().isoformat(),
+                "transaction_type": "No transaction",
+                "merchant": "No transaction",
+                "amount": 0,
+            }
+        ]
 
     # Return the transactions as a DataFrame
     df_transactions = pd.DataFrame(response.json())
@@ -167,17 +177,6 @@ def create_html_email(transactions: List[dict]) -> str:
 
     # Load your HTML template
     template = env.get_template("base.html")
-
-    # If there are no transactions, create a list with a "No transaction"
-    # message
-    if len(transactions) == 0:
-        transactions = [
-            {
-                "transaction_type": "No transaction",
-                "merchant": "No transaction",
-                "amount": 0,
-            }
-        ]
 
     # Get the summary of the transactions
     summary = {
@@ -317,7 +316,8 @@ if __name__ == "__main__":
     html = create_html_email(gross_transactions)
 
     # Create the step plot
-    create_step_plot(gross_transactions)
+    if gross_transactions[0]["transaction_type"] != "No transaction":
+        create_step_plot(gross_transactions)
 
     # Save the html
     with open("monitoring/static/processed_transactions.html", "w") as f:

@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from smtplib import SMTP_SSL, SMTP_SSL_PORT
 
+import datetime
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -19,7 +20,7 @@ def send_email(html_body: str) -> None:
     html_body : str
         The html body of the processed transactions.
     """
-    from_email = f"Expenses inform 💵 <{os.getenv('EMAIL_FROM')}>"
+    from_email = f"Expenses inform 💵 - {datetime.datetime.now().date()} <{os.getenv('FROM_EMAIL')}>"  # noqa
     to_emails = [os.getenv("TO_EMAIL")]
 
     # Create multipart MIME email
