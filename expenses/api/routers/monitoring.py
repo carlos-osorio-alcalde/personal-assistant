@@ -20,7 +20,9 @@ router = APIRouter(prefix="/monitoring")
 @router.post(
     "/retrain_anomaly_model", dependencies=[Depends(check_access_token)]
 )
-def retrain_anomaly_model() -> str:
+def retrain_anomaly_model(
+    max_samples: int, contamination: float, bootstrap: bool
+) -> str:
     """
     This function retrains the anomaly model with the current data
     and save the model as a pkl file
@@ -58,9 +60,9 @@ def retrain_anomaly_model() -> str:
 
     # Fit the Isolation Forest model
     params = {
-        "max_samples": 150,
-        "contamination": "auto",
-        "bootstrap": True,
+        "max_samples": max_samples,
+        "contamination": contamination,
+        "bootstrap": bootstrap,
     }
     model = IsolationForest(**params)
     model.fit(X)

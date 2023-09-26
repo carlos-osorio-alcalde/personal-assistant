@@ -2,6 +2,7 @@ import datetime
 import os
 from typing import List, Literal, Union
 
+import numpy as np
 import pandas as pd
 import pytz
 import requests
@@ -155,8 +156,10 @@ def create_html_email(transactions: List[dict]) -> str:
         The html email to send.
     """
     # Check the day status
-    day_status = check_anomaly(
-        compute_daily_values(pd.DataFrame(transactions))
+    day_status = (
+        check_anomaly(compute_daily_values(pd.DataFrame(transactions)))
+        if len(transactions) > 0
+        else "normal"
     )
 
     # Create a Jinja2 environment with a template loader
@@ -164,6 +167,17 @@ def create_html_email(transactions: List[dict]) -> str:
 
     # Load your HTML template
     template = env.get_template("base.html")
+
+    # If there are no transactions, create a list with a "No transaction"
+    # message
+    if len(transactions) == 0:
+        transactions = [
+            {
+                "transaction_type": "No transaction",
+                "merchant": "No transaction",
+                "amount": 0,
+            }
+        ]
 
     # Get the summary of the transactions
     summary = {
@@ -179,7 +193,6 @@ def create_html_email(transactions: List[dict]) -> str:
             )
         ),
     }
-
     # Render the template with the data
     rendered_template = template.render(
         date_value=datetime.datetime.now()
@@ -227,6 +240,9 @@ def create_step_plot(transactions: List[dict]) -> plt.figure:
     fig = plt.figure(figsize=(10, 5))
     ax = fig.add_subplot(1, 1, 1)
 
+    # Values of the transactions
+    gross_values = [transaction["amount"] for transaction in transactions]
+
     # Times of the transactions
     datetimes = (
         [datetime.datetime.now().replace(hour=0, minute=0, second=0)]
@@ -238,17 +254,8 @@ def create_step_plot(transactions: List[dict]) -> plt.figure:
     )
     values = (
         [0]
-        + [
-            (-1)
-            * sum(
-                [transaction["amount"] for transaction in transactions[:i]]
-            )
-            for i in range(len(transactions))
-        ]
-        + [
-            (-1)
-            * sum([transaction["amount"] for transaction in transactions])
-        ]
+        + [(-1) * sum(gross_values[:i]) for i in range(len(transactions))]
+        + [(-1) * sum(gross_values)]
     )
 
     # Create the plot. Add the 0:00:00 hours and the 23:59:59 hours. For
@@ -256,10 +263,15 @@ def create_step_plot(transactions: List[dict]) -> plt.figure:
     # by the number of the last transaction. The y values must be the
     # rolling sum of the amount.
     ax.step(datetimes, values, color="#29A7A0")
-
     # Create points in the plot
-    ax.plot(datetimes, values, "o", color="#29A7A0")
-
+    ax.scatter(
+        datetimes,
+        values,
+        color="#053937",
+        s=[30]
+        + [(200 * v) / sum(gross_values) for v in gross_values]
+        + [30],
+    )
     # In the xticks, show uniquely the hours without the date
     ax.set_xticks(
         [
