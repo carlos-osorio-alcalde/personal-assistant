@@ -17,6 +17,11 @@ from expenses.processors.schemas import TransactionInfo
 
 router = APIRouter(prefix="/expenses")
 
+# Emails to obtain the transactions from
+EMAILS_FROM_ = [
+    "alertasynotificaciones@notificacionesbancolombia.com",
+    "alertasynotificaciones@bancolombia.com.co",
+]
 
 # Function to get the transactions from the database
 def get_gross_transactions(
@@ -41,7 +46,12 @@ def get_gross_transactions(
     transactions = (
         transactions_from_db
         if len(transactions_from_db) > 0
-        else get_transactions(date_to_search)
+        else get_transactions(
+            email_from=EMAILS_FROM_[0], date_to_search=date_to_search
+        )
+        + get_transactions(
+            email_from=EMAILS_FROM_[1], date_to_search=date_to_search
+        )
     )
 
     return transactions
