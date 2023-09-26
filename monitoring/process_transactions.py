@@ -57,7 +57,7 @@ def get_transactions(
     return (
         df_transactions[
             df_transactions["transaction_type"].isin(
-                ["Compra", "Transferencia", "QR"]
+                ["Compra", "Transferencia", "QR", "Pago"]
             )
         ]
         if return_as_pandas
@@ -65,7 +65,7 @@ def get_transactions(
             transaction
             for transaction in response.json()
             if transaction["transaction_type"]
-            in ["Compra", "Transferencia", "QR"]
+            in ["Compra", "Transferencia", "QR", "Pago"]
         ]
     )
 
