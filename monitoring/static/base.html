@@ -184,15 +184,15 @@
             <div class="comparison-data">Comparing to a normal day, today's spending was {{ relationship }}x</div>
         </div>
 
-        {% if day_status == "anomalous" %}
+        {% if day_status == "anomaly" %}
         <div class="anomalous-box">
             <div class="anomalous-image">&times;</div>
-            <p class="text-anomaly">This was an {{ day_status }} day</p>
+            <p class="text-anomaly">This was an anomalous day</p>
         </div>
         {% else %}
         <div class="normal-box">
             <div class="anomalous-image">&#10003;</div>
-            <p class="text-anomaly">This was a {{ day_status }} day</p>
+            <p class="text-anomaly">This was a normal day</p>
         </div>
         {% endif %}
     </div>
