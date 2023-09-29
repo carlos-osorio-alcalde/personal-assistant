@@ -14,10 +14,15 @@ if os.path.exists("expenses/.env"):
     load_dotenv(dotenv_path="expenses/.env")
 
 
-def get_cursor() -> Union[pyodbc.Cursor, None]:
+def get_cursor(return_conn: bool = False) -> Union[pyodbc.Cursor, None]:
     """
     This function creates a connection to the database.
 
+    Parameters
+    ----------
+    return_conn : bool, optional
+        If True, the function returns the connection to the database,
+        by default False.
     Returns
     -------
     pyodbc.Connection
@@ -33,7 +38,7 @@ def get_cursor() -> Union[pyodbc.Cursor, None]:
             PWD={os.getenv("PASSWORD")}"""
         )
         cursor = conn.cursor()
-        return cursor
+        return cursor if not return_conn else (conn, cursor)
     except Exception:
         return None
 

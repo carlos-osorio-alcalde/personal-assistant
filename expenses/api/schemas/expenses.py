@@ -1,4 +1,5 @@
 import datetime
+from typing import Union
 
 from pydantic import BaseModel
 
@@ -10,9 +11,9 @@ class BaseTransactionInfo(BaseModel):
     This class represents the base of the transaction info.
     """
 
-    name: str | None
-    amount: float | None
-    count: int | None
+    name: Union[str, None]
+    amount: Union[float, None]
+    count: Union[int, None]
 
 
 class SummaryTransactionInfo(BaseModel):
@@ -47,5 +48,14 @@ class SummaryADayLikeToday(BaseModel):
     today.
     """
 
-    mean_number_of_purchases: float | None
-    median_amount_of_purchases: float | None
+    mean_number_of_purchases: Union[float, None]
+    median_amount_of_purchases: Union[float, None]
+
+
+class AnomalyPredictionOutput(BaseModel):
+    """
+    This class represents the input of the anomaly prediction.
+    """
+
+    score: float
+    prediction: str

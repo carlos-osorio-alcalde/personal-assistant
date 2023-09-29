@@ -33,7 +33,7 @@ class PurchaseEmailProcessor(EmailProcessor):
         """
         pattern = (
             r"(?i)Compra por (?P<purchase_amount>.*?) "
-            r"en (?P<merchant>[\w\s.*\/-]+)"
+            r"en (?P<merchant>[\w\s.*\/,-]+)"
             r"(?: (?P<time>\d{2}:\d{2}). (?P<date>\d{2}/\d{2}/\d{4}))"
             r"(?i)(?: (?P<payment_method>(?:T\.Cred|T\.Deb|compra afiliada"
             r" a T\.Cred) \*\d+))?"

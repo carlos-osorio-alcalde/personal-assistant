@@ -4,6 +4,7 @@ from expenses.api.routers import (
     database_router,
     expenses_router,
     merchants_router,
+    monitoring_router,
 )
 from expenses.api.security import check_access_token
 
@@ -21,6 +22,7 @@ async def root():
 app.include_router(expenses_router, tags=["Expenses"])
 app.include_router(database_router, tags=["Database"])
 app.include_router(merchants_router, tags=["Merchants"])
+app.include_router(monitoring_router, tags=["Monitoring"])
 
 if __name__ == "__main__":
     import uvicorn
