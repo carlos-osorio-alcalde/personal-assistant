@@ -44,12 +44,7 @@ class StartCommand(BaseCommand):
         )
 
         # Check if the sender is the id of Carlos
-        start_message = (
-            create_start_answer(**get_weekday_moment())
-            if str(update.effective_user.id)
-            == os.environ.get("ALLOWED_USER_ID")
-            else "You are not allowed to use this bot."
-        )
+        start_message = create_start_answer(**get_weekday_moment())
 
         # Send the start message to the user
         await context.bot.send_message(
