@@ -10,7 +10,6 @@ from assistantbot.ai.text.prompts.pronunciation import (
     WORD_PRONUNCIATION_ASSESSMENT_PARTICULAR,
     WORDS_PRONUNCIATION_ASSESSMENT_BASE,
 )
-from assistantbot.logs.configuration import logger
 from assistantbot.ai.voice.pronunciation import PronunciationAssessment
 from assistantbot.ai.voice.synthesizer import VoiceSynthesizer
 from assistantbot.ai.voice.whisper import transcript_audio
@@ -19,6 +18,7 @@ from assistantbot.conversation.chains import (
     get_conversation_chain,
     update_memory,
 )
+from assistantbot.logs.configuration import logger
 
 
 class VoiceHandler(ConversationHandler):
