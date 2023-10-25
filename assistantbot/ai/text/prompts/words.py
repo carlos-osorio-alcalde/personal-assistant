@@ -18,7 +18,4 @@ Inform that to Carlos and use as much emojis as you can! Suggest him to
 try again later.
 """
 
-USER_PROMPT_TEMPLATE = """
-Tell me the sentence with the word {word} in a funny way without using
-complex words.
-"""
+USER_PROMPT_TEMPLATE = ""
