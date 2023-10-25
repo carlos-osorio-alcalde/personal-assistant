@@ -42,8 +42,8 @@ class StartCorrectionModeCommand(BaseCommand):
             The callback context.
         """
         entry_message = """
-        Hey Carlos! Send me a message to correct your grammar. I pledge to
-        not make a lot of changes.
+        Send me a message to correct your grammar. I pledge to
+        not make a lot of changes 😅
         """
 
         # First, the bot sends the option to write the message to correct

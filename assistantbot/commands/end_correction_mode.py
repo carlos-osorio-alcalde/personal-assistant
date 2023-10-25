@@ -58,7 +58,7 @@ class EndCorrectionModeCommand(BaseCommand):
             The end of the conversation.
         """
         # Message to end the conversation
-        final_message = "Ok, Carlos! You will return to the normal mode."
+        final_message = "Ok! You will return to the normal mode."
 
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
