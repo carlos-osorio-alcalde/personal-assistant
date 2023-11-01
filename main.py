@@ -17,5 +17,3 @@ if __name__ == "__main__":
     while True:
         with handle_expections():
             bot.main()
-
-
