@@ -37,6 +37,6 @@ jobs:
               docker kill $container_ids
             fi
 
-            az acr login --name $CONTAINER_REGISTRY
+            docker login ${{ env.CONTAINER_REGISTRY }}.azurecr.io
             docker pull $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest
-            docker run -d --restart unless-stopped --env-file personal-assitant/.env $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest
+            docker run -d --restart unless-stopped --env-file .env $CONTAINER_REGISTRY.azurecr.io/$IMAGE_NAME:latest
