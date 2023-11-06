@@ -6,11 +6,7 @@ from telegram.ext import ApplicationBuilder
 from assistantbot.commands import temperature
 from assistantbot.commands_handlers import get_implemented_command_handlers
 from assistantbot.configuration import config
-from assistantbot.conversation import (
-    TextHandler,
-    VisionHandler,
-    VoiceHandler,
-)
+from assistantbot.conversation import TextHandler
 from assistantbot.error_handler import error_handler
 from assistantbot.logs.configuration import logger
 
@@ -46,14 +42,7 @@ def main() -> None:
         app.add_handler(handler.command_handler())
 
     # Add the conversation handlers
-    conversation_handlers = (
-        TextHandler().handler(),
-        VoiceHandler().handler(),
-        VisionHandler().handler(),
-    )
-
-    for handler in conversation_handlers:
-        app.add_handler(handler)
+    app.add_handler(TextHandler().handler())
 
     # Add the error handler
     app.add_error_handler(error_handler)

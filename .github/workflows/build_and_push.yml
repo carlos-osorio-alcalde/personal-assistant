@@ -26,6 +26,7 @@ jobs:
       - name: Log in to Azure
         run: |
           az login
+          az account set --subscription azure_sponsorhip
 
       - name: Build Docker image
         run: |
