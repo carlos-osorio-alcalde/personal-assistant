@@ -71,82 +71,20 @@ class VoiceHandler(ConversationHandler):
         context : _type_
             The context object from Telegram.
         """
-        # If a voice message is sent, the bot will reply with a text message
-        # containing the text of the voice message.
-        voice_file = update.message.voice
+        # Get the message text
+        response_message = """
+🚀 Hey there, folks! 
+We're moving to @lingolearn_bot for an even better English learning experience! 
+While this direction will no longer be available, rest assured that everything remains the same, just in a new direction.
+See you there! 🌟📚😊
+"""
 
-        # Send the typing action
-        await context.bot.send_chat_action(
-            chat_id=update.effective_chat.id,
-            action="record_voice",
-            read_timeout=20,
-            write_timeout=20,
-        )
-
-        # Get the voice message
-        voice_file = await context.bot.get_file(voice_file.file_id)
-
-        # Save the file in the folder temp of the same directory of this file
-        output_file = (
-            f"{Path(__file__).parent.absolute()}/temp/"
-            f"{voice_file.file_unique_id}"
-        )
-
-        # Download the file
-        await voice_file.download_to_drive(f"{output_file}.ogg")
-
-        # Convert the downloaded .ogg file to .wav
-        self._process_incoming_audio(
-            f"{output_file}.ogg", f"{output_file}.wav"
-        )
-
-        # Obtain response message
-        entry_message = await self._transcript_voice_message(
-            f"{output_file}.wav"
-        )
-        response_message = await self._create_text_response(
-            update.effective_user.id, entry_message
-        )
-
-        # Send the response message via voice
-        voice_synthetizer = VoiceSynthesizer(
-            file_to_save=f"{output_file}_response.ogg"
-        )
-        await voice_synthetizer.synthetize_text(response_message)
-
-        # Send the voice message
-        await context.bot.send_voice(
-            chat_id=update.effective_chat.id,
-            voice=open(f"{output_file}_response.ogg", "rb"),
-            caption=response_message[0:1024],
-        )
-
-        # Get the final response with the voice message and the
-        # pronunciation assessment
-        # Get the pronunciation assessment
-        try:
-            assessment_message = (
-                await self._get_pronuntiation_assessment_response(
-                    entry_message, f"{output_file}.wav"
-                )
-            )
-        except Exception as e:
-            logger.error(e)
-            assessment_message = """Well, something happened and I wasn't
-            able to assess your pronunciation 🫠. This could happen when
-            the message is very long or when the message contains a lot of
-            words. I'm working on it to fix it as soon as possible! 🛠"""
-
-        # Send the assessment message
+        # Send the start message to the user
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=assessment_message,
-            parse_mode="HTML",
+            text=response_message,
         )
 
-        # Delete the .wav files
-        Path(f"{output_file}.wav").unlink()
-        Path(f"{output_file}_response.ogg").unlink()
 
     @staticmethod
     def _process_incoming_audio(input_file: str, output_file: str) -> None:
